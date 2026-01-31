@@ -1,7 +1,7 @@
 {
   "collectionName": "components_activity_timetable_activities",
   "info": {
-    "displayName": "Timetable Activity",
+    "displayName": "Timetable Item",
     "icon": "clock"
   },
   "options": {},
@@ -13,11 +13,11 @@
     "endTime": {
       "type": "time"
     },
-    "activityName": {
+    "itemName": {
       "type": "string",
       "required": true
     },
-    "activityNote": {
+    "itemNote": {
       "type": "text"
     }
   },

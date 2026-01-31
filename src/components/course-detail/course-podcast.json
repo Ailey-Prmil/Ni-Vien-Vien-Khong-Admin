@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_course_detail_course_podcasts",
+  "info": {
+    "displayName": "CoursePodcast"
+  },
+  "options": {},
+  "attributes": {
+    "day": {
+      "type": "integer"
+    },
+    "title": {
+      "type": "string"
+    },
+    "podcastAsset": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "files",
+        "audios",
+        "videos"
+      ]
+    }
+  },
+  "config": {}
+}

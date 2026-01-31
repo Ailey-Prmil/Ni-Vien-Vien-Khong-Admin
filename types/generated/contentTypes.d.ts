@@ -619,6 +619,156 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiCourseRegistrationCourseRegistration
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'course_registrations';
+  info: {
+    displayName: 'CourseRegistration';
+    pluralName: 'course-registrations';
+    singularName: 'course-registration';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    address: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    emaiil: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    fullName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-registration.course-registration'
+    >;
+    phoneNumber: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    registedCourse: Schema.Attribute.Relation<'oneToOne', 'api::course.course'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
+  collectionName: 'courses';
+  info: {
+    displayName: 'Course';
+    pluralName: 'courses';
+    singularName: 'course';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    category: Schema.Attribute.Enumeration<
+      [
+        'Kh\u00F3a Tu M\u00F9a H\u00E8',
+        'Kh\u00F3a Tu Xu\u1EA5t Gia Gieo Duy\u00EAn',
+        'Kh\u00F3a Thi\u1EC1n',
+        'Kh\u00E1c',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    courseContent: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    courseName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    courseRegistration: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::course-registration.course-registration'
+    >;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    highlightedImages: Schema.Attribute.Media<'images' | 'files', true> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::course.course'>;
+    podcastSection: Schema.Attribute.Component<
+      'course-detail.course-podcast',
+      true
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    videoSection: Schema.Attribute.Component<
+      'course-detail.course-video',
+      true
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+  };
+}
+
 export interface ApiHistoryPageHistoryPage extends Struct.SingleTypeSchema {
   collectionName: 'history_pages';
   info: {
@@ -1633,6 +1783,8 @@ declare module '@strapi/strapi' {
       'api::activity.activity': ApiActivityActivity;
       'api::calligraphy.calligraphy': ApiCalligraphyCalligraphy;
       'api::contact-page.contact-page': ApiContactPageContactPage;
+      'api::course-registration.course-registration': ApiCourseRegistrationCourseRegistration;
+      'api::course.course': ApiCourseCourse;
       'api::history-page.history-page': ApiHistoryPageHistoryPage;
       'api::home-page.home-page': ApiHomePageHomePage;
       'api::introduction-page.introduction-page': ApiIntroductionPageIntroductionPage;

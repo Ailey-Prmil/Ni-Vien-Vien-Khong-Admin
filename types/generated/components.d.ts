@@ -3,14 +3,48 @@ import type { Schema, Struct } from '@strapi/strapi';
 export interface ActivityTimetableActivity extends Struct.ComponentSchema {
   collectionName: 'components_activity_timetable_activities';
   info: {
-    displayName: 'Timetable Activity';
+    displayName: 'Timetable Item';
     icon: 'clock';
   };
   attributes: {
-    activityName: Schema.Attribute.String & Schema.Attribute.Required;
-    activityNote: Schema.Attribute.Text;
     endTime: Schema.Attribute.Time;
+    itemName: Schema.Attribute.String & Schema.Attribute.Required;
+    itemNote: Schema.Attribute.Text;
     startTime: Schema.Attribute.Time & Schema.Attribute.Required;
+  };
+}
+
+export interface CourseDetailCoursePodcast extends Struct.ComponentSchema {
+  collectionName: 'components_course_detail_course_podcasts';
+  info: {
+    displayName: 'CoursePodcast';
+  };
+  attributes: {
+    day: Schema.Attribute.Integer;
+    podcastAsset: Schema.Attribute.Media<'files' | 'audios' | 'videos'> &
+      Schema.Attribute.Required;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface CourseDetailCourseVideo extends Struct.ComponentSchema {
+  collectionName: 'components_course_detail_course_videos';
+  info: {
+    displayName: 'Course Video';
+    icon: 'cast';
+  };
+  attributes: {
+    day: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 15;
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
+    title: Schema.Attribute.String;
+    videoLink: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -58,6 +92,8 @@ declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'activity.timetable-activity': ActivityTimetableActivity;
+      'course-detail.course-podcast': CourseDetailCoursePodcast;
+      'course-detail.course-video': CourseDetailCourseVideo;
       'place.monastery': PlaceMonastery;
       'response.blog-response': ResponseBlogResponse;
       'response.video-response': ResponseVideoResponse;
