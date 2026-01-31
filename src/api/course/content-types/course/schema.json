@@ -44,7 +44,7 @@
           "localized": true
         }
       },
-      "required": true
+      "required": false
     },
     "category": {
       "type": "enumeration",

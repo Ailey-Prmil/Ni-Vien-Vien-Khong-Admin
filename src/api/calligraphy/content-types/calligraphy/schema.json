@@ -15,6 +15,20 @@
     }
   },
   "attributes": {
+    "coverImage": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
     "category": {
       "type": "enumeration",
       "pluginOptions": {
@@ -29,6 +43,15 @@
         "Chủ Đề Khác"
       ]
     },
+    "description": {
+      "type": "text",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
     "title": {
       "type": "string",
       "pluginOptions": {
@@ -36,30 +59,7 @@
           "localized": true
         }
       },
-      "required": true
-    },
-    "content": {
-      "type": "blocks",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "required": true
-    },
-    "coverImage": {
-      "type": "media",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "multiple": false,
-      "required": true,
-      "allowedTypes": [
-        "images",
-        "files"
-      ]
+      "required": false
     },
     "calligraphy": {
       "type": "relation",
