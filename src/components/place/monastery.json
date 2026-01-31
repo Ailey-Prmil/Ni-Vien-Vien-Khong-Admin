@@ -1,0 +1,38 @@
+{
+  "collectionName": "components_place_monasteries",
+  "info": {
+    "displayName": "Monastery",
+    "icon": "pinMap"
+  },
+  "options": {},
+  "attributes": {
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "monasteryName": {
+      "type": "string",
+      "required": true
+    },
+    "monasteryAddress": {
+      "type": "string",
+      "required": true
+    },
+    "monasteryDescription": {
+      "type": "string"
+    },
+    "openingHour": {
+      "type": "time"
+    },
+    "closingHour": {
+      "type": "time"
+    }
+  },
+  "config": {}
+}

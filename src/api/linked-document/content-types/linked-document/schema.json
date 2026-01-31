@@ -1,0 +1,70 @@
+{
+  "kind": "collectionType",
+  "collectionName": "linked_documents",
+  "info": {
+    "singularName": "linked-document",
+    "pluralName": "linked-documents",
+    "displayName": "LinkedDocument"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "link": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true,
+      "enum": [
+        "Tạng Kinh",
+        "Tạng Luật",
+        "Tạng Vi Diệu Pháp",
+        "Sách Sơ Tổ Hộ Tông",
+        "Sách Sư Ông Viên Minh",
+        "Tài Liệu Học Pali",
+        "Danh Mục Sách Khác"
+      ]
+    },
+    "coverImage": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}

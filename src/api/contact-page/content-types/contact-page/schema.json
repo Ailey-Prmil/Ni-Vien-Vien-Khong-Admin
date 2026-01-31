@@ -1,0 +1,77 @@
+{
+  "kind": "singleType",
+  "collectionName": "contact_pages",
+  "info": {
+    "singularName": "contact-page",
+    "pluralName": "contact-pages",
+    "displayName": "ContactPage"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "address": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "Tổ 2, Ấp 4, Xã Châu Pha, Thành phố Hồ Chí Minh, Việt Nam",
+      "required": true
+    },
+    "phoneNumber": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "097 446 99 63",
+      "required": true,
+      "regex": "^\\+?[1-9]\\d{7,14}$"
+    },
+    "emailPrimary": {
+      "type": "email",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "required": true,
+      "default": "lieuphap@gmail.com"
+    },
+    "haveSecondaryEmail": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "emailSecondary": {
+      "type": "email",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "haveSecondaryEmail"
+            },
+            true
+          ]
+        }
+      },
+      "default": "nivienvienkhong2019@gmail.com"
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "kind": "collectionType",
+  "collectionName": "calligraphies",
+  "info": {
+    "singularName": "calligraphy",
+    "pluralName": "calligraphies",
+    "displayName": "Calligraphy"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "category": {
+      "type": "enumeration",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true,
+      "enum": [
+        "Kinh Pháp Cú",
+        "Kinh Tụng",
+        "Chủ Đề Khác"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "content": {
+      "type": "blocks",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "coverImage": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "calligraphy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::calligraphy.calligraphy",
+      "inversedBy": "relatedCalligraphies"
+    },
+    "relatedCalligraphies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::calligraphy.calligraphy",
+      "mappedBy": "calligraphy"
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "kind": "singleType",
+  "collectionName": "introduction_pages",
+  "info": {
+    "singularName": "introduction-page",
+    "pluralName": "introduction-pages",
+    "displayName": "IntroductionPage"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "coverImage": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "Thời Khóa Tu Tập",
+      "required": true
+    },
+    "content": {
+      "type": "blocks",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "useTemplate": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "required": true,
+      "default": false
+    },
+    "activities": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "useTemplate"
+            },
+            true
+          ]
+        }
+      },
+      "component": "activity.timetable-activity",
+      "repeatable": true,
+      "required": true
+    }
+  }
+}

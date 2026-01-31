@@ -1,0 +1,63 @@
+{
+  "kind": "collectionType",
+  "collectionName": "rituals",
+  "info": {
+    "singularName": "ritual",
+    "pluralName": "rituals",
+    "displayName": "Ritual"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "content": {
+      "type": "blocks",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "coverImage": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "ritual": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::ritual.ritual",
+      "inversedBy": "relatedRituals"
+    },
+    "relatedRituals": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ritual.ritual",
+      "mappedBy": "ritual"
+    }
+  }
+}

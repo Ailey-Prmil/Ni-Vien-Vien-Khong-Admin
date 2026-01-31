@@ -430,6 +430,696 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
+  collectionName: 'activities';
+  info: {
+    displayName: 'Activity';
+    pluralName: 'activities';
+    singularName: 'activity';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    activity: Schema.Attribute.Relation<'manyToOne', 'api::activity.activity'>;
+    activityDate: Schema.Attribute.Date & Schema.Attribute.Required;
+    category: Schema.Attribute.Enumeration<
+      [
+        'Ph\u1EADt S\u1EF1 Trong N\u01B0\u1EDBc',
+        'Ph\u1EADt S\u1EF1 N\u01B0\u1EDBc Ngo\u00E0i',
+        'L\u1EDBp H\u1ECDc Ph\u1EADt Ph\u00E1p',
+        'Tin T\u1EE9c Kh\u00E1c',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Ph\u1EADt S\u1EF1 Trong N\u01B0\u1EDBc'>;
+    content: Schema.Attribute.Blocks;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::activity.activity'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    relatedActivities: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::activity.activity'
+    >;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCalligraphyCalligraphy extends Struct.CollectionTypeSchema {
+  collectionName: 'calligraphies';
+  info: {
+    displayName: 'Calligraphy';
+    pluralName: 'calligraphies';
+    singularName: 'calligraphy';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    calligraphy: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::calligraphy.calligraphy'
+    >;
+    category: Schema.Attribute.Enumeration<
+      [
+        'Kinh Ph\u00E1p C\u00FA',
+        'Kinh T\u1EE5ng',
+        'Ch\u1EE7 \u0110\u1EC1 Kh\u00E1c',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    content: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::calligraphy.calligraphy'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    relatedCalligraphies: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::calligraphy.calligraphy'
+    >;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
+  collectionName: 'contact_pages';
+  info: {
+    displayName: 'ContactPage';
+    pluralName: 'contact-pages';
+    singularName: 'contact-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    address: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'T\u1ED5 2, \u1EA4p 4, X\u00E3 Ch\u00E2u Pha, Th\u00E0nh ph\u1ED1 H\u1ED3 Ch\u00ED Minh, Vi\u1EC7t Nam'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    emailPrimary: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'lieuphap@gmail.com'>;
+    emailSecondary: Schema.Attribute.Email &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'nivienvienkhong2019@gmail.com'>;
+    haveSecondaryEmail: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::contact-page.contact-page'
+    >;
+    phoneNumber: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'097 446 99 63'>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiHistoryPageHistoryPage extends Struct.SingleTypeSchema {
+  collectionName: 'history_pages';
+  info: {
+    displayName: 'HistoryPage';
+    pluralName: 'history-pages';
+    singularName: 'history-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::history-page.history-page'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'Ni Vi\u1EC7n Vi\u00EAn Kh\u00F4ng X\u01B0a v\u00E0 Nay'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
+  collectionName: 'home_pages';
+  info: {
+    displayName: 'HomePage';
+    pluralName: 'home-pages';
+    singularName: 'home-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::home-page.home-page'
+    >;
+    openingMessage: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiIntroductionPageIntroductionPage
+  extends Struct.SingleTypeSchema {
+  collectionName: 'introduction_pages';
+  info: {
+    displayName: 'IntroductionPage';
+    pluralName: 'introduction-pages';
+    singularName: 'introduction-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    activities: Schema.Attribute.Component<
+      'activity.timetable-activity',
+      true
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    content: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::introduction-page.introduction-page'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'Th\u1EDDi Kh\u00F3a Tu T\u1EADp'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    useTemplate: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<false>;
+  };
+}
+
+export interface ApiLinkedDocumentLinkedDocument
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'linked_documents';
+  info: {
+    displayName: 'LinkedDocument';
+    pluralName: 'linked-documents';
+    singularName: 'linked-document';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    category: Schema.Attribute.Enumeration<
+      [
+        'T\u1EA1ng Kinh',
+        'T\u1EA1ng Lu\u1EADt',
+        'T\u1EA1ng Vi Di\u1EC7u Ph\u00E1p',
+        'S\u00E1ch S\u01A1 T\u1ED5 H\u1ED9 T\u00F4ng',
+        'S\u00E1ch S\u01B0 \u00D4ng Vi\u00EAn Minh',
+        'T\u00E0i Li\u1EC7u H\u1ECDc Pali',
+        'Danh M\u1EE5c S\u00E1ch Kh\u00E1c',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    link: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::linked-document.linked-document'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiMonasteryPageMonasteryPage extends Struct.SingleTypeSchema {
+  collectionName: 'monastery_pages';
+  info: {
+    displayName: 'MonasteryPage';
+    pluralName: 'monastery-pages';
+    singularName: 'monastery-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    content: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::monastery-page.monastery-page'
+    >;
+    monasteries: Schema.Attribute.Component<'place.monastery', true> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'C\u00E1c Tu Vi\u1EC7n Kh\u00E1c'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    useTemplate: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<false>;
+  };
+}
+
+export interface ApiPoemPoem extends Struct.CollectionTypeSchema {
+  collectionName: 'poems';
+  info: {
+    displayName: 'Poem';
+    pluralName: 'poems';
+    singularName: 'poem';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::poem.poem'>;
+    poem: Schema.Attribute.Relation<'manyToOne', 'api::poem.poem'>;
+    publishedAt: Schema.Attribute.DateTime;
+    relatedPoems: Schema.Attribute.Relation<'oneToMany', 'api::poem.poem'>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiRitualRitual extends Struct.CollectionTypeSchema {
+  collectionName: 'rituals';
+  info: {
+    displayName: 'Ritual';
+    pluralName: 'rituals';
+    singularName: 'ritual';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::ritual.ritual'>;
+    publishedAt: Schema.Attribute.DateTime;
+    relatedRituals: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::ritual.ritual'
+    >;
+    ritual: Schema.Attribute.Relation<'manyToOne', 'api::ritual.ritual'>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiUserQuestionUserQuestion
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'user_questions';
+  info: {
+    displayName: 'UserQuestion';
+    pluralName: 'user-questions';
+    singularName: 'user-question';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    address: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    blogResponseContent: Schema.Attribute.Component<
+      'response.blog-response',
+      false
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    fullName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-question.user-question'
+    >;
+    phoneNumber: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    questionContent: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    videoResponseContent: Schema.Attribute.Component<
+      'response.video-response',
+      false
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -940,6 +1630,17 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::activity.activity': ApiActivityActivity;
+      'api::calligraphy.calligraphy': ApiCalligraphyCalligraphy;
+      'api::contact-page.contact-page': ApiContactPageContactPage;
+      'api::history-page.history-page': ApiHistoryPageHistoryPage;
+      'api::home-page.home-page': ApiHomePageHomePage;
+      'api::introduction-page.introduction-page': ApiIntroductionPageIntroductionPage;
+      'api::linked-document.linked-document': ApiLinkedDocumentLinkedDocument;
+      'api::monastery-page.monastery-page': ApiMonasteryPageMonasteryPage;
+      'api::poem.poem': ApiPoemPoem;
+      'api::ritual.ritual': ApiRitualRitual;
+      'api::user-question.user-question': ApiUserQuestionUserQuestion;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

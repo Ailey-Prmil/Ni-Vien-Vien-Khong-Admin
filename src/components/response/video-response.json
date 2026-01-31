@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_response_video_responses",
+  "info": {
+    "displayName": "Video Response"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": false
+    },
+    "videoLink": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "config": {}
+}

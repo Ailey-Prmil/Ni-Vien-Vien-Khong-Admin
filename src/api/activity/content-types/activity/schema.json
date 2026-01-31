@@ -1,0 +1,62 @@
+{
+  "kind": "collectionType",
+  "collectionName": "activities",
+  "info": {
+    "singularName": "activity",
+    "pluralName": "activities",
+    "displayName": "Activity"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "activityDate": {
+      "type": "date",
+      "required": true
+    },
+    "content": {
+      "type": "blocks"
+    },
+    "category": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Phật Sự Trong Nước",
+      "enum": [
+        "Phật Sự Trong Nước",
+        "Phật Sự Nước Ngoài",
+        "Lớp Học Phật Pháp",
+        "Tin Tức Khác"
+      ]
+    },
+    "activity": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::activity.activity",
+      "inversedBy": "relatedActivities"
+    },
+    "relatedActivities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::activity.activity",
+      "mappedBy": "activity"
+    }
+  }
+}

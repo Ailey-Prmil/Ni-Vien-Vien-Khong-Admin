@@ -1,0 +1,63 @@
+{
+  "kind": "collectionType",
+  "collectionName": "poems",
+  "info": {
+    "singularName": "poem",
+    "pluralName": "poems",
+    "displayName": "Poem"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "coverImage": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "content": {
+      "type": "blocks",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "poem": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::poem.poem",
+      "inversedBy": "relatedPoems"
+    },
+    "relatedPoems": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::poem.poem",
+      "mappedBy": "poem"
+    }
+  }
+}

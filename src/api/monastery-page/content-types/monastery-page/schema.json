@@ -1,0 +1,82 @@
+{
+  "kind": "singleType",
+  "collectionName": "monastery_pages",
+  "info": {
+    "singularName": "monastery-page",
+    "pluralName": "monastery-pages",
+    "displayName": "MonasteryPage"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "coverImage": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "Các Tu Viện Khác",
+      "required": true
+    },
+    "content": {
+      "type": "text",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "useTemplate": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true,
+      "default": false
+    },
+    "monasteries": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "useTemplate"
+            },
+            true
+          ]
+        }
+      },
+      "component": "place.monastery",
+      "repeatable": true,
+      "required": true
+    }
+  }
+}

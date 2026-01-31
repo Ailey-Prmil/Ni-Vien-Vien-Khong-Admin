@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_response_blog_responses",
+  "info": {
+    "displayName": "Blog Response"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "responseContent": {
+      "type": "blocks",
+      "required": true
+    }
+  },
+  "config": {}
+}
