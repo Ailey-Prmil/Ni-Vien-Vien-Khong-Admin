@@ -42,11 +42,31 @@
         "files"
       ]
     },
+    "isEvent": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "required": true,
+      "default": true
+    },
     "activityDate": {
       "type": "date",
       "pluginOptions": {
         "i18n": {
           "localized": true
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "isEvent"
+            },
+            true
+          ]
         }
       },
       "required": true
