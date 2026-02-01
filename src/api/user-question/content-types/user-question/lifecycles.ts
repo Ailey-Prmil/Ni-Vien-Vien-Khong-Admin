@@ -1,0 +1,77 @@
+export default {
+  async afterCreate(event) {
+    const { result } = event;
+    const executionId = Date.now(); // Simple ID to track execution
+    console.log(`[UserQuestion] afterCreate triggered. ID: ${executionId}, Result ID: ${result.id}, Locale: ${result.locale}, PublishedAt: ${result.publishedAt}`);
+
+    try {
+      // Only send email when the question is PUBLISHED (has a publishedAt date)
+      // Strapi's Draft & Publish system triggers afterCreate twice: once for Draft (null), once for Published (date).
+      // We ignore the Draft event to avoid duplicate emails.
+      if (!result.publishedAt) {
+        console.log(`[UserQuestion] Skipping Draft entry. ID: ${executionId}, Result ID: ${result.id}`);
+        return;
+      }
+
+      // Fetch active admin users with their roles
+      const adminUsers = await strapi.db.query('admin::user').findMany({
+        where: {
+          isActive: true,
+        },
+        populate: ['roles'],
+      });
+
+      // Filter users who have Super Admin or Editor roles
+      const notifiableRoles = ['Super Admin', 'Editor'];
+      const recipientEmails = adminUsers
+        .filter((user) =>
+          user.roles?.some((role) => notifiableRoles.includes(role.name))
+        )
+        .map((user) => user.email)
+        .filter(Boolean);
+
+      // Deduplicate emails
+      const uniqueRecipientEmails = [...new Set(recipientEmails)];
+
+      if (uniqueRecipientEmails.length === 0) {
+        console.warn(`[UserQuestion] No Super Admin or Editor users found to notify. ID: ${executionId}`);
+        return;
+      }
+
+      console.log(`[UserQuestion] Sending email to: ${uniqueRecipientEmails.join(', ')}. ID: ${executionId}`);
+
+      // Send email to all recipients
+      await strapi.plugins['email'].services.email.send({
+        to: uniqueRecipientEmails,
+        from: process.env.SMTP_DEFAULT_FROM || '22520038@gm.uit.edu.vn',
+        subject: `New Question from ${result.fullName} - Ni Viện Viên Không`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #8B4513;">Câu hỏi mới từ website</h2>
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
+              <p><strong>Người gửi:</strong> ${result.fullName}</p>
+              <p><strong>Email:</strong> ${result.email}</p>
+              ${result.phoneNumber ? `<p><strong>Số điện thoại:</strong> ${result.phoneNumber}</p>` : ''}
+              <p><strong>Câu hỏi:</strong></p>
+              <blockquote style="background: #fff; padding: 15px; border-left: 4px solid #8B4513; margin: 10px 0;">
+                ${result.questionContent}
+              </blockquote>
+              <p><strong>Trạng thái:</strong> <span style="color: #ff9800;">${result.questionStatus || 'pending'}</span></p>
+              <p><strong>Thời gian:</strong> ${new Date(result.createdAt).toLocaleString('vi-VN')}</p>
+            </div>
+            <p style="margin-top: 20px;">
+              <a href="${process.env.STRAPI_ADMIN_URL || 'http://localhost:1337'}/admin/content-manager/collection-types/api::user-question.user-question/${result.documentId}" 
+                 style="background-color: #8B4513; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                Xem trong Admin Panel
+              </a>
+            </p>
+          </div>
+        `,
+      });
+
+      console.log(`[UserQuestion] Email sent successfully. ID: ${executionId}`);
+    } catch (error) {
+      console.error(`[UserQuestion] Error sending email. ID: ${executionId}`, error);
+    }
+  },
+};

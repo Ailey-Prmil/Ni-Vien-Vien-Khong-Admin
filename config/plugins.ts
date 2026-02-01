@@ -1,4 +1,6 @@
 // config/plugins.ts
+
+
 export default ({ env }) => {
   const config: any = {
     documentation: {
@@ -20,6 +22,23 @@ export default ({ env }) => {
         restrictedAccess: true, // Always require admin login to view docs
       },
     },
+    email: {
+      config: {
+        provider: 'nodemailer',
+        providerOptions: {
+          host: env('SMTP_HOST', 'smtp.gmail.com'),
+          port: env('SMTP_PORT', 587),
+          auth: {
+            user: env('SMTP_USERNAME'),
+            pass: env('SMTP_PASSWORD'),
+          },
+        },
+        settings: {
+          defaultFrom: env('SMTP_DEFAULT_FROM', '22520038@gm.uit.edu.vn'),
+          defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', '22520038@gm.uit.edu.vn'),
+        },
+      },
+    },
   };
 
   if (env("NODE_ENV") === "development") {
@@ -29,6 +48,7 @@ export default ({ env }) => {
       },
     };
   }
+
 
   return config;
 };
