@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-01T12:57:43.121Z"
+    "x-generation-date": "2026-02-01T13:49:05.144Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -23376,7 +23376,8 @@
               "address",
               "email",
               "title",
-              "questionContent"
+              "questionContent",
+              "questionStatus"
             ],
             "type": "object",
             "properties": {
@@ -23404,6 +23405,14 @@
               },
               "blogResponseContent": {
                 "$ref": "#/components/schemas/ResponseBlogResponseComponent"
+              },
+              "questionStatus": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "answered",
+                  "rejected"
+                ]
               },
               "locale": {
                 "type": "string"
@@ -23468,7 +23477,8 @@
           "address",
           "email",
           "title",
-          "questionContent"
+          "questionContent",
+          "questionStatus"
         ],
         "properties": {
           "id": {
@@ -23508,6 +23518,14 @@
           },
           "blogResponseContent": {
             "$ref": "#/components/schemas/ResponseBlogResponseComponent"
+          },
+          "questionStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "answered",
+              "rejected"
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -23945,6 +23963,14 @@
                 },
                 "blogResponseContent": {
                   "$ref": "#/components/schemas/ResponseBlogResponseComponent"
+                },
+                "questionStatus": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "answered",
+                    "rejected"
+                  ]
                 },
                 "createdAt": {
                   "type": "string",

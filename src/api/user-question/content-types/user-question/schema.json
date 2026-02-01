@@ -89,6 +89,21 @@
       },
       "component": "response.blog-response",
       "repeatable": false
+    },
+    "questionStatus": {
+      "type": "enumeration",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "required": true,
+      "default": "pending",
+      "enum": [
+        "pending",
+        "answered",
+        "rejected"
+      ]
     }
   }
 }

@@ -1289,6 +1289,16 @@ export interface ApiUserQuestionUserQuestion
           localized: true;
         };
       }>;
+    questionStatus: Schema.Attribute.Enumeration<
+      ['pending', 'answered', 'rejected']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'pending'>;
     title: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
