@@ -17,6 +17,7 @@ export default ({ env }) => {
         'x-strapi-config': {
           plugins: ['users-permissions', 'upload'],
         },
+        restrictedAccess: true, // Always require admin login to view docs
       },
     },
   };
