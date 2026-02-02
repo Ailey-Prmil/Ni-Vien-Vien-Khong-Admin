@@ -70,26 +70,6 @@
       },
       "required": true
     },
-    "videoResponseContent": {
-      "type": "component",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "component": "response.video-response",
-      "repeatable": false
-    },
-    "blogResponseContent": {
-      "type": "component",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "component": "response.blog-response",
-      "repeatable": false
-    },
     "questionStatus": {
       "type": "enumeration",
       "pluginOptions": {
@@ -104,6 +84,46 @@
         "answered",
         "rejected"
       ]
+    },
+    "videoResponseContent": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "questionStatus"
+            },
+            "answered"
+          ]
+        }
+      },
+      "component": "response.video-response",
+      "repeatable": false
+    },
+    "blogResponseContent": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "questionStatus"
+            },
+            "answered"
+          ]
+        }
+      },
+      "component": "response.blog-response",
+      "repeatable": false
     }
   }
 }

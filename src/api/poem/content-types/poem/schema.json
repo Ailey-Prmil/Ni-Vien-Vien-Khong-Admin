@@ -24,6 +24,14 @@
       },
       "required": true
     },
+    "author": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
     "coverImage": {
       "type": "media",
       "pluginOptions": {
