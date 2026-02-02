@@ -6,12 +6,25 @@
   },
   "options": {},
   "attributes": {
+    "haveOrdinalDate": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
     "day": {
       "type": "integer",
-      "required": false,
-      "default": 1,
-      "min": 1,
-      "max": 15
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "haveOrdinalDate"
+            },
+            true
+          ]
+        }
+      },
+      "required": true,
+      "default": 1
     },
     "title": {
       "type": "string"

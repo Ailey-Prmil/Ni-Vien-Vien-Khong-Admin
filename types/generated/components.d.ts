@@ -17,10 +17,13 @@ export interface ActivityTimetableActivity extends Struct.ComponentSchema {
 export interface CourseDetailCoursePodcast extends Struct.ComponentSchema {
   collectionName: 'components_course_detail_course_podcasts';
   info: {
-    displayName: 'CoursePodcast';
+    displayName: 'Course Podcast';
   };
   attributes: {
-    day: Schema.Attribute.Integer;
+    day: Schema.Attribute.Integer & Schema.Attribute.Required;
+    haveOrdinalDate: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
     podcastAsset: Schema.Attribute.Media<'files' | 'audios' | 'videos'> &
       Schema.Attribute.Required;
     title: Schema.Attribute.String;
@@ -35,14 +38,11 @@ export interface CourseDetailCourseVideo extends Struct.ComponentSchema {
   };
   attributes: {
     day: Schema.Attribute.Integer &
-      Schema.Attribute.SetMinMax<
-        {
-          max: 15;
-          min: 1;
-        },
-        number
-      > &
+      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<1>;
+    haveOrdinalDate: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
     title: Schema.Attribute.String;
     videoLink: Schema.Attribute.String & Schema.Attribute.Required;
   };

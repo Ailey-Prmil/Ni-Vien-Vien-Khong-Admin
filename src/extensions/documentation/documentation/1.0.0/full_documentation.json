@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-01T16:22:49.891Z"
+    "x-generation-date": "2026-02-02T18:03:56.709Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -12432,6 +12432,9 @@
               }
             ]
           },
+          "haveOrdinalDate": {
+            "type": "boolean"
+          },
           "day": {
             "type": "integer"
           },
@@ -12455,6 +12458,9 @@
                 "type": "number"
               }
             ]
+          },
+          "haveOrdinalDate": {
+            "type": "boolean"
           },
           "day": {
             "type": "integer"
@@ -20677,6 +20683,9 @@
               "title": {
                 "type": "string"
               },
+              "author": {
+                "type": "string"
+              },
               "coverImage": {
                 "oneOf": [
                   {
@@ -20792,6 +20801,9 @@
             "type": "string"
           },
           "title": {
+            "type": "string"
+          },
+          "author": {
             "type": "string"
           },
           "coverImage": {
@@ -21620,6 +21632,9 @@
                 "type": "string"
               },
               "title": {
+                "type": "string"
+              },
+              "author": {
                 "type": "string"
               },
               "coverImage": {
@@ -23373,7 +23388,6 @@
           "data": {
             "required": [
               "fullName",
-              "address",
               "email",
               "title",
               "questionContent",
@@ -23384,14 +23398,14 @@
               "fullName": {
                 "type": "string"
               },
-              "address": {
-                "type": "string"
-              },
               "email": {
                 "type": "string",
                 "format": "email"
               },
               "phoneNumber": {
+                "type": "string"
+              },
+              "address": {
                 "type": "string"
               },
               "title": {
@@ -23400,12 +23414,6 @@
               "questionContent": {
                 "type": "string"
               },
-              "videoResponseContent": {
-                "$ref": "#/components/schemas/ResponseVideoResponseComponent"
-              },
-              "blogResponseContent": {
-                "$ref": "#/components/schemas/ResponseBlogResponseComponent"
-              },
               "questionStatus": {
                 "type": "string",
                 "enum": [
@@ -23413,6 +23421,12 @@
                   "answered",
                   "rejected"
                 ]
+              },
+              "videoResponseContent": {
+                "$ref": "#/components/schemas/ResponseVideoResponseComponent"
+              },
+              "blogResponseContent": {
+                "$ref": "#/components/schemas/ResponseBlogResponseComponent"
               },
               "locale": {
                 "type": "string"
@@ -23474,7 +23488,6 @@
         "type": "object",
         "required": [
           "fullName",
-          "address",
           "email",
           "title",
           "questionContent",
@@ -23497,14 +23510,14 @@
           "fullName": {
             "type": "string"
           },
-          "address": {
-            "type": "string"
-          },
           "email": {
             "type": "string",
             "format": "email"
           },
           "phoneNumber": {
+            "type": "string"
+          },
+          "address": {
             "type": "string"
           },
           "title": {
@@ -23513,12 +23526,6 @@
           "questionContent": {
             "type": "string"
           },
-          "videoResponseContent": {
-            "$ref": "#/components/schemas/ResponseVideoResponseComponent"
-          },
-          "blogResponseContent": {
-            "$ref": "#/components/schemas/ResponseBlogResponseComponent"
-          },
           "questionStatus": {
             "type": "string",
             "enum": [
@@ -23526,6 +23533,12 @@
               "answered",
               "rejected"
             ]
+          },
+          "videoResponseContent": {
+            "$ref": "#/components/schemas/ResponseVideoResponseComponent"
+          },
+          "blogResponseContent": {
+            "$ref": "#/components/schemas/ResponseBlogResponseComponent"
           },
           "createdAt": {
             "type": "string",
@@ -23942,14 +23955,14 @@
                 "fullName": {
                   "type": "string"
                 },
-                "address": {
-                  "type": "string"
-                },
                 "email": {
                   "type": "string",
                   "format": "email"
                 },
                 "phoneNumber": {
+                  "type": "string"
+                },
+                "address": {
                   "type": "string"
                 },
                 "title": {
@@ -23958,12 +23971,6 @@
                 "questionContent": {
                   "type": "string"
                 },
-                "videoResponseContent": {
-                  "$ref": "#/components/schemas/ResponseVideoResponseComponent"
-                },
-                "blogResponseContent": {
-                  "$ref": "#/components/schemas/ResponseBlogResponseComponent"
-                },
                 "questionStatus": {
                   "type": "string",
                   "enum": [
@@ -23971,6 +23978,12 @@
                     "answered",
                     "rejected"
                   ]
+                },
+                "videoResponseContent": {
+                  "$ref": "#/components/schemas/ResponseVideoResponseComponent"
+                },
+                "blogResponseContent": {
+                  "$ref": "#/components/schemas/ResponseBlogResponseComponent"
                 },
                 "createdAt": {
                   "type": "string",

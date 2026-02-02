@@ -1244,7 +1244,6 @@ export interface ApiUserQuestionUserQuestion
   };
   attributes: {
     address: Schema.Attribute.String &
-      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;

@@ -24,15 +24,6 @@
       },
       "required": true
     },
-    "address": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "required": true
-    },
     "email": {
       "type": "email",
       "pluginOptions": {
@@ -51,6 +42,15 @@
       },
       "required": false,
       "regex": "^\\+?[0-9]\\d{7,14}$"
+    },
+    "address": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "required": false
     },
     "title": {
       "type": "string",

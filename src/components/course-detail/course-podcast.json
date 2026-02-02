@@ -1,12 +1,28 @@
 {
   "collectionName": "components_course_detail_course_podcasts",
   "info": {
-    "displayName": "CoursePodcast"
+    "displayName": "Course Podcast"
   },
   "options": {},
   "attributes": {
+    "haveOrdinalDate": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
     "day": {
-      "type": "integer"
+      "type": "integer",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "haveOrdinalDate"
+            },
+            true
+          ]
+        }
+      },
+      "required": true
     },
     "title": {
       "type": "string"
