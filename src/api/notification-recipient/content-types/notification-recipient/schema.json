@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notification_recipients",
+  "info": {
+    "singularName": "notification-recipient",
+    "pluralName": "notification-recipients",
+    "displayName": "NotificationRecipient"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "text",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "isActive": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    }
+  }
+}

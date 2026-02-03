@@ -1127,6 +1127,39 @@ export interface ApiMonasteryPageMonasteryPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiNotificationRecipientNotificationRecipient
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'notification_recipients';
+  info: {
+    displayName: 'NotificationRecipient';
+    pluralName: 'notification-recipients';
+    singularName: 'notification-recipient';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::notification-recipient.notification-recipient'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.Text & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPoemPoem extends Struct.CollectionTypeSchema {
   collectionName: 'poems';
   info: {
@@ -1852,6 +1885,7 @@ declare module '@strapi/strapi' {
       'api::introduction-page.introduction-page': ApiIntroductionPageIntroductionPage;
       'api::linked-document.linked-document': ApiLinkedDocumentLinkedDocument;
       'api::monastery-page.monastery-page': ApiMonasteryPageMonasteryPage;
+      'api::notification-recipient.notification-recipient': ApiNotificationRecipientNotificationRecipient;
       'api::poem.poem': ApiPoemPoem;
       'api::ritual.ritual': ApiRitualRitual;
       'api::user-question.user-question': ApiUserQuestionUserQuestion;
