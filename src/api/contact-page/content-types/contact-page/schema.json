@@ -72,6 +72,42 @@
         }
       },
       "default": "nivienvienkhong2019@gmail.com"
+    },
+    "facebookLink": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": "https://www.facebook.com/Nivienvienkhong"
+    },
+    "youtubeLink": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "https://www.youtube.com/c/NiVi%E1%BB%87nVi%C3%AAnKh%C3%B4ng"
+    },
+    "messengerLink": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "https://m.me/Nivienvienkhong"
+    },
+    "zaloLink": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "https://zalo.me/0974469963"
     }
   }
 }

@@ -631,6 +631,13 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
         };
       }> &
       Schema.Attribute.DefaultTo<'nivienvienkhong2019@gmail.com'>;
+    facebookLink: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'https://www.facebook.com/Nivienvienkhong'>;
     haveSecondaryEmail: Schema.Attribute.Boolean &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -642,6 +649,13 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
       'oneToMany',
       'api::contact-page.contact-page'
     >;
+    messengerLink: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'https://m.me/Nivienvienkhong'>;
     phoneNumber: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -654,6 +668,20 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    youtubeLink: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'https://www.youtube.com/c/NiVi%E1%BB%87nVi%C3%AAnKh%C3%B4ng'>;
+    zaloLink: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'https://zalo.me/0974469963'>;
   };
 }
 

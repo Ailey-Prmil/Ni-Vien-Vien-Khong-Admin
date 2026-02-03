@@ -7,7 +7,7 @@ export default ({ env }) => {
       config: {
         openapi: "3.0.0",
         info: {
-          version: "2.0.0",
+          version: "3.0.0",
           title: "Ni Vien Vien Khong API",
           description: "API documentation for Buddhist monastery website",
           contact: {
