@@ -28,6 +28,7 @@ export default ({ env }) => {
         providerOptions: {
           host: env('SMTP_HOST', 'smtp.gmail.com'),
           port: env('SMTP_PORT', 587),
+          secure: false, // true for 465, false for other ports
           auth: {
             user: env('SMTP_USERNAME'),
             pass: env('SMTP_PASSWORD'),
@@ -37,6 +38,14 @@ export default ({ env }) => {
           defaultFrom: env('SMTP_DEFAULT_FROM', '22520038@gm.uit.edu.vn'),
           defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', '22520038@gm.uit.edu.vn'),
         },
+      },
+    },
+    // Disable Strapi Cloud's built-in email service
+    cloud: {
+      enabled: true,
+      config: {
+        autoSyncMetadata: true,
+        email: false, // Disable cloud email service
       },
     },
   };
