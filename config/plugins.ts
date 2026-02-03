@@ -40,14 +40,6 @@ export default ({ env }) => {
         },
       },
     },
-    // Disable Strapi Cloud's built-in email service
-    cloud: {
-      enabled: true,
-      config: {
-        autoSyncMetadata: true,
-        email: false, // Disable cloud email service
-      },
-    },
   };
 
   if (env("NODE_ENV") === "development") {
