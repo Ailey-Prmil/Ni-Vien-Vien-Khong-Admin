@@ -13,38 +13,56 @@ export default {
         return;
       }
 
-      // Fetch active admin users with their roles
-      const adminUsers = await strapi.db.query('admin::user').findMany({
-        where: {
-          isActive: true,
-        },
-        populate: ['roles'],
-      });
+      // Fetch notification recipients from the collection
+      const recipients = await strapi.entityService.findMany(
+        'api::notification-recipient.notification-recipient',
+        {
+          filters: {
+            isActive: true,
+          },
+          fields: ['email', 'name'],
+        }
+      );
 
-      // Filter users who have Super Admin or Editor roles
-      const notifiableRoles = ['Super Admin', 'Editor'];
-      const recipientEmails = adminUsers
-        .filter((user) =>
-          user.roles?.some((role) => notifiableRoles.includes(role.name))
-        )
-        .map((user) => user.email)
-        .filter(Boolean);
-
-      // Deduplicate emails
-      const uniqueRecipientEmails = [...new Set(recipientEmails)];
-
-      if (uniqueRecipientEmails.length === 0) {
-        console.warn(`[UserQuestion] No Super Admin or Editor users found to notify. ID: ${executionId}`);
+      // Handle case where no recipients are configured
+      if (!recipients || recipients.length === 0) {
+        console.warn(
+          `[UserQuestion] No active notification recipients configured. ` +
+          `Please add recipients via Admin Panel. ID: ${executionId}`
+        );
         return;
       }
 
-      console.log(`[UserQuestion] Sending email to: ${uniqueRecipientEmails.join(', ')}. ID: ${executionId}`);
+      // Extract and deduplicate emails
+      const recipientEmails = recipients
+        .map((recipient) => recipient.email)
+        .filter(Boolean);
+
+      const uniqueRecipientEmails = [...new Set(recipientEmails)];
+
+      if (uniqueRecipientEmails.length === 0) {
+        console.warn(
+          `[UserQuestion] Recipients found but no valid emails extracted. ID: ${executionId}`
+        );
+        return;
+      }
+
+      console.log(
+        `[UserQuestion] Sending email to ${uniqueRecipientEmails.length} recipient(s): ` +
+        `${uniqueRecipientEmails.join(', ')}. ID: ${executionId}`
+      );
+
+      // Get email subject from environment variable or use default
+      const emailSubject = process.env.USERQUESTION_EMAIL_SUBJECT ||
+        `New Question from ${result.fullName} - Ni Viện Viên Không`;
 
       // Send email to all recipients
+      // Explicitly set from and replyTo for cloud-mailer compatibility
       await strapi.plugins['email'].services.email.send({
         to: uniqueRecipientEmails,
-        from: process.env.SMTP_DEFAULT_FROM || '22520038@gm.uit.edu.vn',
-        subject: `New Question from ${result.fullName} - Ni Viện Viên Không`,
+        from: process.env.SMTP_DEFAULT_FROM || 'thejourneytofuture@gmail.com',
+        replyTo: process.env.SMTP_DEFAULT_REPLY_TO || 'thejourneytofuture@gmail.com',
+        subject: emailSubject,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #8B4513;">Câu hỏi mới từ website</h2>
@@ -69,7 +87,9 @@ export default {
         `,
       });
 
-      console.log(`[UserQuestion] Email sent successfully. ID: ${executionId}`);
+      console.log(
+        `[UserQuestion] Email sent successfully to ${uniqueRecipientEmails.length} recipient(s). ID: ${executionId}`
+      );
     } catch (error) {
       console.error(`[UserQuestion] Error sending email. ID: ${executionId}`, error);
     }

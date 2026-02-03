@@ -680,16 +680,24 @@ export interface ApiCourseRegistrationCourseRegistration
           localized: false;
         };
       }>;
-    confirmed: Schema.Attribute.Boolean &
+    confirmationToken: Schema.Attribute.String &
+      Schema.Attribute.Private &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
         };
       }>;
+    confirmed: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    emaiil: Schema.Attribute.Email &
+    email: Schema.Attribute.Email &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -716,7 +724,10 @@ export interface ApiCourseRegistrationCourseRegistration
         };
       }>;
     publishedAt: Schema.Attribute.DateTime;
-    registedCourse: Schema.Attribute.Relation<'oneToOne', 'api::course.course'>;
+    registedCourse: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::course.course'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -767,7 +778,7 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
         };
       }>;
     courseRegistration: Schema.Attribute.Relation<
-      'oneToOne',
+      'oneToMany',
       'api::course-registration.course-registration'
     >;
     coverImage: Schema.Attribute.Media<'images' | 'files'> &
@@ -1113,6 +1124,39 @@ export interface ApiMonasteryPageMonasteryPage extends Struct.SingleTypeSchema {
         };
       }> &
       Schema.Attribute.DefaultTo<false>;
+  };
+}
+
+export interface ApiNotificationRecipientNotificationRecipient
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'notification_recipients';
+  info: {
+    displayName: 'NotificationRecipient';
+    pluralName: 'notification-recipients';
+    singularName: 'notification-recipient';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::notification-recipient.notification-recipient'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.Text & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -1846,6 +1890,7 @@ declare module '@strapi/strapi' {
       'api::introduction-page.introduction-page': ApiIntroductionPageIntroductionPage;
       'api::linked-document.linked-document': ApiLinkedDocumentLinkedDocument;
       'api::monastery-page.monastery-page': ApiMonasteryPageMonasteryPage;
+      'api::notification-recipient.notification-recipient': ApiNotificationRecipientNotificationRecipient;
       'api::poem.poem': ApiPoemPoem;
       'api::ritual.ritual': ApiRitualRitual;
       'api::user-question.user-question': ApiUserQuestionUserQuestion;

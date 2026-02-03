@@ -96,7 +96,7 @@
     },
     "courseRegistration": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::course-registration.course-registration",
       "mappedBy": "registedCourse"
     }
