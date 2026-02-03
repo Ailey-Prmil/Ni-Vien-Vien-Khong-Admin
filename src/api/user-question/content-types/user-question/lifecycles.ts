@@ -57,9 +57,9 @@ export default {
         `New Question from ${result.fullName} - Ni Viện Viên Không`;
 
       // Send email to all recipients
+      // Note: from and replyTo will use defaults from plugins.ts config
       await strapi.plugins['email'].services.email.send({
         to: uniqueRecipientEmails,
-        from: process.env.SMTP_DEFAULT_FROM || '22520038@gm.uit.edu.vn',
         subject: emailSubject,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

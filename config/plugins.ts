@@ -35,8 +35,8 @@ export default ({ env }) => {
           },
         },
         settings: {
-          defaultFrom: env('SMTP_DEFAULT_FROM', '22520038@gm.uit.edu.vn'),
-          defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', '22520038@gm.uit.edu.vn'),
+          defaultFrom: env('SMTP_DEFAULT_FROM', 'no-reply@strapi.io'),
+          defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', 'thejourneytofuture@gmail.com'),
         },
       },
     },
