@@ -35,7 +35,7 @@ export default ({ env }) => {
           },
         },
         settings: {
-          defaultFrom: env('SMTP_DEFAULT_FROM', 'no-reply@strapi.io'),
+          defaultFrom: env('SMTP_DEFAULT_FROM', 'thejourneytofuture@gmail.com'),
           defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', 'thejourneytofuture@gmail.com'),
         },
       },
