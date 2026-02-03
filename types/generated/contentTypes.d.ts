@@ -680,16 +680,24 @@ export interface ApiCourseRegistrationCourseRegistration
           localized: false;
         };
       }>;
-    confirmed: Schema.Attribute.Boolean &
+    confirmationToken: Schema.Attribute.String &
+      Schema.Attribute.Private &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
         };
       }>;
+    confirmed: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    emaiil: Schema.Attribute.Email &
+    email: Schema.Attribute.Email &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -716,7 +724,10 @@ export interface ApiCourseRegistrationCourseRegistration
         };
       }>;
     publishedAt: Schema.Attribute.DateTime;
-    registedCourse: Schema.Attribute.Relation<'oneToOne', 'api::course.course'>;
+    registedCourse: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::course.course'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -767,7 +778,7 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
         };
       }>;
     courseRegistration: Schema.Attribute.Relation<
-      'oneToOne',
+      'oneToMany',
       'api::course-registration.course-registration'
     >;
     coverImage: Schema.Attribute.Media<'images' | 'files'> &
