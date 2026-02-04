@@ -35,22 +35,25 @@
     },
     "phoneNumber": {
       "type": "string",
+      "private": true,
       "pluginOptions": {
         "i18n": {
           "localized": false
         }
       },
       "required": false,
-      "regex": "^\\+?[0-9]\\d{7,14}$"
+      "regex": "^(?:0\\d{9}|\\+\\d{1,3}\\s?\\d{7,12})$"
     },
     "address": {
       "type": "string",
+      "private": true,
       "pluginOptions": {
         "i18n": {
           "localized": false
         }
       },
-      "required": false
+      "required": false,
+      "unique": false
     },
     "title": {
       "type": "string",

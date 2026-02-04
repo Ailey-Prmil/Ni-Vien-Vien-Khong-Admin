@@ -46,6 +46,22 @@
       },
       "required": false
     },
+    "courseStartDate": {
+      "type": "date",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "courseEndDate": {
+      "type": "date",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
     "category": {
       "type": "enumeration",
       "pluginOptions": {

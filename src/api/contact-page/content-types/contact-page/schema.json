@@ -80,34 +80,38 @@
           "localized": false
         }
       },
-      "default": "https://www.facebook.com/Nivienvienkhong"
+      "default": "https://www.facebook.com/Nivienvienkhong",
+      "required": true
     },
     "youtubeLink": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
-          "localized": true
+          "localized": false
         }
       },
-      "default": "https://www.youtube.com/c/NiVi%E1%BB%87nVi%C3%AAnKh%C3%B4ng"
+      "default": "https://www.youtube.com/c/NiVi%E1%BB%87nVi%C3%AAnKh%C3%B4ng",
+      "required": true
     },
     "messengerLink": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
-          "localized": true
+          "localized": false
         }
       },
-      "default": "https://m.me/Nivienvienkhong"
+      "default": "https://m.me/Nivienvienkhong",
+      "required": true
     },
     "zaloLink": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
-          "localized": true
+          "localized": false
         }
       },
-      "default": "https://zalo.me/0974469963"
+      "default": "https://zalo.me/0974469963",
+      "required": true
     }
   }
 }
