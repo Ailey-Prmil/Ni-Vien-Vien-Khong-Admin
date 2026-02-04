@@ -698,7 +698,7 @@ export interface ApiCourseRegistrationCourseRegistration
     singularName: 'course-registration';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   pluginOptions: {
     i18n: {

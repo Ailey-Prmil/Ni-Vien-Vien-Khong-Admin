@@ -20,14 +20,22 @@ export default {
                 return;
             }
 
-            // Construct the confirmation URL
-            // In production, this should be an ENV variable like FRONTEND_URL
-            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            const confirmationLink = `${frontendUrl}/course-registration/confirm?code=${result.confirmationToken}`;
+            // Construct the confirmation URL - points to backend API
+            // The backend will handle confirmation and redirect to frontend
+            const backendUrl = process.env.STRAPI_ADMIN_URL || 'http://localhost:1337';
+            const confirmationLink = `${backendUrl}/api/course-registrations/confirm?code=${result.confirmationToken}`;
+
+            // Debug logging
+            // console.log('[CourseRegistration] ========== EMAIL DEBUG ==========');
+            // console.log('[CourseRegistration] STRAPI_ADMIN_URL env:', process.env.STRAPI_ADMIN_URL);
+            // console.log('[CourseRegistration] backendUrl used:', backendUrl);
+            // console.log('[CourseRegistration] confirmationToken:', result.confirmationToken);
+            // console.log('[CourseRegistration] FULL confirmationLink:', confirmationLink);
+            // console.log('[CourseRegistration] ================================');
 
             await strapi.plugins['email'].services.email.send({
                 to: result.email,
-                from: process.env.SMTP_DEFAULT_FROM || '22520038@gm.uit.edu.vn',
+                from: process.env.SMTP_DEFAULT_FROM || process.env.EMAIL_DEFAULT_FROM,
                 subject: `Xác nhận đăng ký khóa tu - Ni Viện Viên Không`,
                 html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
