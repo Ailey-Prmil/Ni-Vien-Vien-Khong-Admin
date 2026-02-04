@@ -24,19 +24,13 @@ export default ({ env }) => {
     },
     email: {
       config: {
-        provider: 'nodemailer',
+        provider: 'strapi-provider-email-resend',
         providerOptions: {
-          host: env('SMTP_HOST', 'smtp.gmail.com'),
-          port: env('SMTP_PORT', 587),
-          secure: false, // true for 465, false for other ports
-          auth: {
-            user: env('SMTP_USERNAME'),
-            pass: env('SMTP_PASSWORD'),
-          },
+          apiKey: env('RESEND_API_KEY'),
         },
         settings: {
-          defaultFrom: env('SMTP_DEFAULT_FROM', 'thejourneytofuture@gmail.com'),
-          defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', 'thejourneytofuture@gmail.com'),
+          defaultFrom: env('EMAIL_DEFAULT_FROM'),
+          defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO'),
         },
       },
     },
