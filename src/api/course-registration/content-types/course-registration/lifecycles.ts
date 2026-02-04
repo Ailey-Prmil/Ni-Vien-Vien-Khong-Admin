@@ -26,16 +26,16 @@ export default {
             const confirmationLink = `${backendUrl}/api/course-registrations/confirm?code=${result.confirmationToken}`;
 
             // Debug logging
-            console.log('[CourseRegistration] ========== EMAIL DEBUG ==========');
-            console.log('[CourseRegistration] STRAPI_ADMIN_URL env:', process.env.STRAPI_ADMIN_URL);
-            console.log('[CourseRegistration] backendUrl used:', backendUrl);
-            console.log('[CourseRegistration] confirmationToken:', result.confirmationToken);
-            console.log('[CourseRegistration] FULL confirmationLink:', confirmationLink);
-            console.log('[CourseRegistration] ================================');
+            // console.log('[CourseRegistration] ========== EMAIL DEBUG ==========');
+            // console.log('[CourseRegistration] STRAPI_ADMIN_URL env:', process.env.STRAPI_ADMIN_URL);
+            // console.log('[CourseRegistration] backendUrl used:', backendUrl);
+            // console.log('[CourseRegistration] confirmationToken:', result.confirmationToken);
+            // console.log('[CourseRegistration] FULL confirmationLink:', confirmationLink);
+            // console.log('[CourseRegistration] ================================');
 
             await strapi.plugins['email'].services.email.send({
                 to: result.email,
-                from: process.env.EMAIL_DEFAULT_FROM,
+                from: process.env.SMTP_DEFAULT_FROM || process.env.EMAIL_DEFAULT_FROM,
                 subject: `Xác nhận đăng ký khóa tu - Ni Viện Viên Không`,
                 html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
