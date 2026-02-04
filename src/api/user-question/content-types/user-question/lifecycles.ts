@@ -60,8 +60,8 @@ export default {
       // Explicitly set from and replyTo for cloud-mailer compatibility
       await strapi.plugins['email'].services.email.send({
         to: uniqueRecipientEmails,
-        from: process.env.SMTP_DEFAULT_FROM || 'thejourneytofuture@gmail.com',
-        replyTo: process.env.SMTP_DEFAULT_REPLY_TO || 'thejourneytofuture@gmail.com',
+        from: process.env.EMAIL_DEFAULT_FROM,
+        replyTo: process.env.EMAIL_DEFAULT_REPLY_TO,
         subject: emailSubject,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
