@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-03T17:56:33.055Z"
+    "x-generation-date": "2026-02-04T16:58:20.677Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -10467,7 +10467,11 @@
             "required": [
               "address",
               "phoneNumber",
-              "emailPrimary"
+              "emailPrimary",
+              "facebookLink",
+              "youtubeLink",
+              "messengerLink",
+              "zaloLink"
             ],
             "type": "object",
             "properties": {
@@ -10561,7 +10565,11 @@
         "required": [
           "address",
           "phoneNumber",
-          "emailPrimary"
+          "emailPrimary",
+          "facebookLink",
+          "youtubeLink",
+          "messengerLink",
+          "zaloLink"
         ],
         "properties": {
           "id": {
@@ -11163,6 +11171,14 @@
                 "type": "string"
               },
               "courseContent": {},
+              "courseStartDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "courseEndDate": {
+                "type": "string",
+                "format": "date"
+              },
               "category": {
                 "type": "string",
                 "enum": [
@@ -12100,6 +12116,14 @@
             "type": "string"
           },
           "courseContent": {},
+          "courseStartDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "courseEndDate": {
+            "type": "string",
+            "format": "date"
+          },
           "category": {
             "type": "string",
             "enum": [
@@ -12523,6 +12547,14 @@
                       "type": "string"
                     },
                     "courseContent": {},
+                    "courseStartDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "courseEndDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
                     "category": {
                       "type": "string",
                       "enum": [
@@ -14163,6 +14195,14 @@
                 "type": "string"
               },
               "courseContent": {},
+              "courseStartDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "courseEndDate": {
+                "type": "string",
+                "format": "date"
+              },
               "category": {
                 "type": "string",
                 "enum": [

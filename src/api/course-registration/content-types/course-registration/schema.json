@@ -32,7 +32,7 @@
         }
       },
       "required": true,
-      "regex": "^\\+?[0-9]\\d{7,14}$"
+      "regex": "^(?:0\\d{9}|\\+\\d{1,3}\\s?\\d{7,12})$"
     },
     "email": {
       "type": "email",
@@ -53,12 +53,12 @@
     },
     "confirmed": {
       "type": "boolean",
-      "default": false,
       "pluginOptions": {
         "i18n": {
           "localized": false
         }
-      }
+      },
+      "default": false
     },
     "confirmationToken": {
       "type": "string",
