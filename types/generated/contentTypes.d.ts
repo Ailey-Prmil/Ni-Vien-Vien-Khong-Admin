@@ -1314,6 +1314,60 @@ export interface ApiRitualRitual extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiSceneryPageSceneryPage extends Struct.SingleTypeSchema {
+  collectionName: 'scenery_pages';
+  info: {
+    displayName: 'SceneryPage';
+    pluralName: 'scenery-pages';
+    singularName: 'scenery-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::scenery-page.scenery-page'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'T\u1ECBnh C\u1EA3nh Vi\u00EAn Kh\u00F4ng'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiUserQuestionUserQuestion
   extends Struct.CollectionTypeSchema {
   collectionName: 'user_questions';
@@ -1939,6 +1993,7 @@ declare module '@strapi/strapi' {
       'api::notification-recipient.notification-recipient': ApiNotificationRecipientNotificationRecipient;
       'api::poem.poem': ApiPoemPoem;
       'api::ritual.ritual': ApiRitualRitual;
+      'api::scenery-page.scenery-page': ApiSceneryPageSceneryPage;
       'api::user-question.user-question': ApiUserQuestionUserQuestion;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
