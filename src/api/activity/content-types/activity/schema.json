@@ -15,7 +15,7 @@
     }
   },
   "attributes": {
-    "title": {
+    "activityName": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -26,7 +26,15 @@
     },
     "slug": {
       "type": "uid",
-      "targetField": "title"
+      "targetField": "activityName"
+    },
+    "content": {
+      "type": "blocks",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
     },
     "coverImage": {
       "type": "media",
@@ -37,49 +45,9 @@
       },
       "multiple": false,
       "required": true,
-      "allowedTypes": [
-        "images",
-        "files"
-      ]
+      "allowedTypes": ["images", "files"]
     },
-    "isEvent": {
-      "type": "boolean",
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "required": true,
-      "default": true
-    },
-    "activityDate": {
-      "type": "date",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "isEvent"
-            },
-            true
-          ]
-        }
-      },
-      "required": true
-    },
-    "content": {
-      "type": "blocks",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "category": {
+    "activityCategory": {
       "type": "enumeration",
       "pluginOptions": {
         "i18n": {
@@ -92,8 +60,63 @@
         "Phật Sự Trong Nước",
         "Phật Sự Nước Ngoài",
         "Lớp Học Phật Pháp",
-        "Tin Tức Khác"
+        "Tin Tức Khác",
+        "Khóa Tu"
       ]
+    },
+    "registrationLimit": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "required": true,
+      "default": 0
+    },
+    "activityStartDate": {
+      "type": "date",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "activityEndDate": {
+      "type": "date",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "required": false
+    },
+    "courseContent": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "activityCategory"
+            },
+            "Khóa Tu"
+          ]
+        }
+      },
+      "component": "course-detail.course",
+      "repeatable": false
+    },
+    "relatedActivities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::activity.activity",
+      "mappedBy": "activity"
     },
     "activity": {
       "type": "relation",
@@ -101,11 +124,21 @@
       "target": "api::activity.activity",
       "inversedBy": "relatedActivities"
     },
-    "relatedActivities": {
+    "activityRegistrations": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::activity.activity",
-      "mappedBy": "activity"
+      "target": "api::activity-registration.activity-registration",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "isEvent"
+            },
+            true
+          ]
+        }
+      },
+      "mappedBy": "registeredActivity"
     }
   }
 }
