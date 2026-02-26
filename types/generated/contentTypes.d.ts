@@ -1050,12 +1050,6 @@ export interface ApiLinkedDocumentLinkedDocument
           localized: false;
         };
       }>;
-    coverImage: Schema.Attribute.Media<'images' | 'files'> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false;
-        };
-      }>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1071,6 +1065,12 @@ export interface ApiLinkedDocumentLinkedDocument
       'oneToMany',
       'api::linked-document.linked-document'
     >;
+    mindMap: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String &
       Schema.Attribute.Required &

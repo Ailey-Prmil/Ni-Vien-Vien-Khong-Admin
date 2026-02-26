@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-26T10:39:29.935Z"
+    "x-generation-date": "2026-02-26T11:09:52.908Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -16681,7 +16681,7 @@
                   "Danh Mục Sách Khác"
                 ]
               },
-              "coverImage": {
+              "mindMap": {
                 "oneOf": [
                   {
                     "type": "integer"
@@ -16787,7 +16787,7 @@
               "Danh Mục Sách Khác"
             ]
           },
-          "coverImage": {
+          "mindMap": {
             "type": "object",
             "properties": {
               "id": {
@@ -17682,7 +17682,7 @@
                     "Danh Mục Sách Khác"
                   ]
                 },
-                "coverImage": {
+                "mindMap": {
                   "type": "object",
                   "properties": {
                     "id": {
