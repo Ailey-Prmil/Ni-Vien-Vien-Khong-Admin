@@ -14,6 +14,35 @@ export interface ActivityTimetableActivity extends Struct.ComponentSchema {
   };
 }
 
+export interface CourseDetailCourse extends Struct.ComponentSchema {
+  collectionName: 'components_course_detail_courses';
+  info: {
+    displayName: 'Course';
+    icon: 'book';
+  };
+  attributes: {
+    courseCategory: Schema.Attribute.Enumeration<
+      [
+        'Kh\u00F3a Tu M\u00F9a H\u00E8',
+        'Kh\u00F3a Tu Xu\u1EA5t Gia Gieo Duy\u00EAn',
+        'Kh\u00F3a Thi\u1EC1n',
+        'Kh\u00E1c',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Kh\u00E1c'>;
+    highlightedImages: Schema.Attribute.Media<'images', true>;
+    podcastSection: Schema.Attribute.Component<
+      'course-detail.course-podcast',
+      true
+    >;
+    videoSection: Schema.Attribute.Component<
+      'course-detail.course-video',
+      true
+    >;
+  };
+}
+
 export interface CourseDetailCoursePodcast extends Struct.ComponentSchema {
   collectionName: 'components_course_detail_course_podcasts';
   info: {
@@ -92,6 +121,7 @@ declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'activity.timetable-activity': ActivityTimetableActivity;
+      'course-detail.course': CourseDetailCourse;
       'course-detail.course-podcast': CourseDetailCoursePodcast;
       'course-detail.course-video': CourseDetailCourseVideo;
       'place.monastery': PlaceMonastery;

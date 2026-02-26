@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "course_registrations",
+  "collectionName": "activity_registrations",
   "info": {
-    "singularName": "course-registration",
-    "pluralName": "course-registrations",
-    "displayName": "CourseRegistration"
+    "singularName": "activity-registration",
+    "pluralName": "activity-registrations",
+    "displayName": "ActivityRegistration"
   },
   "options": {
     "draftAndPublish": false
@@ -51,6 +51,27 @@
         }
       }
     },
+    "registrationStatus": {
+      "type": "enumeration",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": ""
+            },
+            ""
+          ]
+        }
+      },
+      "required": false,
+      "default": "active",
+      "enum": ["active", "pending", "canceled"]
+    },
     "confirmed": {
       "type": "boolean",
       "pluginOptions": {
@@ -58,6 +79,17 @@
           "localized": false
         }
       },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "registrationStatus"
+            },
+            "active"
+          ]
+        }
+      },
+      "required": false,
       "default": false
     },
     "confirmationToken": {
@@ -67,13 +99,23 @@
         "i18n": {
           "localized": false
         }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "registrationStatus"
+            },
+            "active"
+          ]
+        }
       }
     },
-    "registedCourse": {
+    "registeredActivity": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::course.course",
-      "inversedBy": "courseRegistration"
+      "target": "api::activity.activity",
+      "inversedBy": "activityRegistrations"
     }
   }
 }
