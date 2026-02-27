@@ -15,36 +15,18 @@
     }
   },
   "attributes": {
-    "fullName": {
-      "type": "string",
+    "registreeData": {
+      "type": "component",
       "pluginOptions": {
         "i18n": {
-          "localized": false
+          "localized": true
         }
       },
-      "required": true
+      "component": "form-section.basic-information",
+      "repeatable": false
     },
-    "phoneNumber": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "required": true,
-      "regex": "^(?:0\\d{9}|\\+\\d{1,3}\\s?\\d{7,12})$"
-    },
-    "email": {
-      "type": "email",
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "required": true
-    },
-    "address": {
-      "type": "string",
+    "registrationPayload": {
+      "type": "json",
       "pluginOptions": {
         "i18n": {
           "localized": false
@@ -70,7 +52,11 @@
       },
       "required": false,
       "default": "active",
-      "enum": ["active", "pending", "canceled"]
+      "enum": [
+        "active",
+        "pending",
+        "canceled"
+      ]
     },
     "confirmed": {
       "type": "boolean",

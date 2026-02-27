@@ -45,7 +45,10 @@
       },
       "multiple": false,
       "required": true,
-      "allowedTypes": ["images", "files"]
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
     },
     "activityCategory": {
       "type": "enumeration",
@@ -73,6 +76,51 @@
       },
       "required": true,
       "default": 0
+    },
+    "ageRestricted": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": false
+    },
+    "minAge": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "ageRestricted"
+            },
+            true
+          ]
+        }
+      }
+    },
+    "maxAge": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "ageRestricted"
+            },
+            true
+          ]
+        }
+      }
     },
     "activityStartDate": {
       "type": "date",
@@ -139,6 +187,16 @@
         }
       },
       "mappedBy": "registeredActivity"
+    },
+    "registrationForm": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "form-component.form-template",
+      "repeatable": false
     }
   }
 }

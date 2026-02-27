@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_form_section_relation_details",
+  "info": {
+    "displayName": "Relation Detail"
+  },
+  "options": {},
+  "attributes": {
+    "fullName": {
+      "type": "string",
+      "required": true
+    },
+    "phoneNumber": {
+      "type": "string",
+      "required": true
+    },
+    "relationship": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "config": {}
+}
