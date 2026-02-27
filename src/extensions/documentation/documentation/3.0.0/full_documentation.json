@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-26T11:09:52.908Z"
+    "x-generation-date": "2026-02-27T16:29:33.961Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -7524,6 +7524,15 @@
               "registrationLimit": {
                 "type": "integer"
               },
+              "ageRestricted": {
+                "type": "boolean"
+              },
+              "minAge": {
+                "type": "integer"
+              },
+              "maxAge": {
+                "type": "integer"
+              },
               "activityStartDate": {
                 "type": "string",
                 "format": "date"
@@ -7573,6 +7582,9 @@
                   ],
                   "example": "string or id"
                 }
+              },
+              "registrationForm": {
+                "$ref": "#/components/schemas/FormComponentFormTemplateComponent"
               },
               "locale": {
                 "type": "string"
@@ -8481,6 +8493,15 @@
           "registrationLimit": {
             "type": "integer"
           },
+          "ageRestricted": {
+            "type": "boolean"
+          },
+          "minAge": {
+            "type": "integer"
+          },
+          "maxAge": {
+            "type": "integer"
+          },
           "activityStartDate": {
             "type": "string",
             "format": "date"
@@ -8701,6 +8722,15 @@
                 "registrationLimit": {
                   "type": "integer"
                 },
+                "ageRestricted": {
+                  "type": "boolean"
+                },
+                "minAge": {
+                  "type": "integer"
+                },
+                "maxAge": {
+                  "type": "integer"
+                },
                 "activityStartDate": {
                   "type": "string",
                   "format": "date"
@@ -8769,19 +8799,10 @@
                       "documentId": {
                         "type": "string"
                       },
-                      "fullName": {
-                        "type": "string"
+                      "registreeData": {
+                        "$ref": "#/components/schemas/FormSectionBasicInformationComponent"
                       },
-                      "phoneNumber": {
-                        "type": "string"
-                      },
-                      "email": {
-                        "type": "string",
-                        "format": "email"
-                      },
-                      "address": {
-                        "type": "string"
-                      },
+                      "registrationPayload": {},
                       "registrationStatus": {
                         "type": "string",
                         "enum": [
@@ -8888,6 +8909,9 @@
                       }
                     }
                   }
+                },
+                "registrationForm": {
+                  "$ref": "#/components/schemas/FormComponentFormTemplateComponent"
                 },
                 "createdAt": {
                   "type": "string",
@@ -9002,6 +9026,9 @@
                 }
               }
             }
+          },
+          "registrationForm": {
+            "$ref": "#/components/schemas/FormComponentFormTemplateComponent"
           },
           "createdAt": {
             "type": "string",
@@ -9517,6 +9544,180 @@
             "items": {
               "$ref": "#/components/schemas/CourseDetailCoursePodcastComponent"
             }
+          }
+        }
+      },
+      "FormComponentTextInputComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "FormComponentMultipleChoiceComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormComponentTextInputComponent"
+            }
+          },
+          "haveOtherValue": {
+            "type": "boolean"
+          },
+          "multipleSelection": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FormComponentFormComponentComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "section": {
+            "type": "string",
+            "enum": [
+              "Thông tin cơ bản (Basic Information)",
+              "Thông tin CCCD (Identity Detail)",
+              "Thông tin tu học (Monatic Detail)",
+              "Thông tin thân nhân (Relation Detail)",
+              "Thông tin sinh hoạt (Routine Detail)",
+              "Thông tin khác (Others)"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "short text",
+              "long text",
+              "bool",
+              "date",
+              "datetime",
+              "number",
+              "multiple choice"
+            ]
+          },
+          "multipleChoiceDetails": {
+            "$ref": "#/components/schemas/FormComponentMultipleChoiceComponent"
+          }
+        }
+      },
+      "FormComponentFormTemplateComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "registrationDescription": {},
+          "defaultIdentitySectionIncluded": {
+            "type": "boolean"
+          },
+          "defaultMonasticSectionIncluded": {
+            "type": "boolean"
+          },
+          "defaultRelationSectionIncluded": {
+            "type": "boolean"
+          },
+          "defaultRoutineSectionIncluded": {
+            "type": "boolean"
+          },
+          "customizedComponents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormComponentFormComponentComponent"
+            }
+          },
+          "commitmentMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormComponentTextInputComponent"
+            }
+          }
+        }
+      },
+      "FormSectionBasicInformationComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "Nam (Male)",
+              "Nữ (Female)"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "haveZalo": {
+            "type": "boolean"
+          },
+          "zaloName": {
+            "type": "string"
           }
         }
       },

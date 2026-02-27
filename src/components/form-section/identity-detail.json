@@ -1,0 +1,42 @@
+{
+  "collectionName": "components_form_section_identity_details",
+  "info": {
+    "displayName": "Identity Detail",
+    "icon": "briefcase"
+  },
+  "options": {},
+  "attributes": {
+    "IDNumber": {
+      "type": "string",
+      "required": true
+    },
+    "issueDate": {
+      "type": "date",
+      "required": true
+    },
+    "issueAt": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "Bộ Công An",
+        "Cục Cảnh sát quản lý hành chính về trật tự xã hội.",
+        "Cục Cảnh sát đăng ký quản lý cư trú và dữ liệu Quốc gia về dân cư.",
+        "Khác"
+      ]
+    },
+    "otherIssueOrganisation": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "issueAt"
+            },
+            "Khác"
+          ]
+        }
+      }
+    }
+  },
+  "config": {}
+}

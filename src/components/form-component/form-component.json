@@ -1,0 +1,52 @@
+{
+  "collectionName": "components_form_component_form_components",
+  "info": {
+    "displayName": "Form Component",
+    "icon": "connector"
+  },
+  "options": {},
+  "attributes": {
+    "section": {
+      "type": "enumeration",
+      "enum": [
+        "Thông tin cơ bản (Basic Information)",
+        "Thông tin CCCD (Identity Detail)",
+        "Thông tin tu học (Monatic Detail)",
+        "Thông tin thân nhân (Relation Detail)",
+        "Thông tin sinh hoạt (Routine Detail)",
+        "Thông tin khác (Others)"
+      ]
+    },
+    "label": {
+      "type": "string"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "short text",
+        "long text",
+        "bool",
+        "date",
+        "datetime",
+        "number",
+        "multiple choice"
+      ]
+    },
+    "multipleChoiceDetails": {
+      "type": "component",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "type"
+            },
+            "multiple choice"
+          ]
+        }
+      },
+      "component": "form-component.multiple-choice",
+      "repeatable": false
+    }
+  },
+  "config": {}
+}
