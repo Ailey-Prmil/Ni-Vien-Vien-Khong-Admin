@@ -201,8 +201,8 @@ export interface FormSectionIdentityDetail extends Struct.ComponentSchema {
     issueAt: Schema.Attribute.Enumeration<
       [
         'B\u1ED9 C\u00F4ng An',
-        'C\u1EE5c C\u1EA3nh s\u00E1t qu\u1EA3n l\u00FD h\u00E0nh ch\u00EDnh v\u1EC1 tr\u1EADt t\u1EF1 x\u00E3 h\u1ED9i.',
-        'C\u1EE5c C\u1EA3nh s\u00E1t \u0111\u0103ng k\u00FD qu\u1EA3n l\u00FD c\u01B0 tr\u00FA v\u00E0 d\u1EEF li\u1EC7u Qu\u1ED1c gia v\u1EC1 d\u00E2n c\u01B0.',
+        'C\u1EE5c C\u1EA3nh s\u00E1t qu\u1EA3n l\u00FD h\u00E0nh ch\u00EDnh v\u1EC1 tr\u1EADt t\u1EF1 x\u00E3 h\u1ED9i',
+        'C\u1EE5c C\u1EA3nh s\u00E1t \u0111\u0103ng k\u00FD qu\u1EA3n l\u00FD c\u01B0 tr\u00FA v\u00E0 d\u1EEF li\u1EC7u Qu\u1ED1c gia v\u1EC1 d\u00E2n c\u01B0',
         'Kh\u00E1c',
       ]
     > &

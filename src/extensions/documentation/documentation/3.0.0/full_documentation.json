@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-27T16:29:33.961Z"
+    "x-generation-date": "2026-02-27T19:09:26.324Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -8803,6 +8803,9 @@
                         "$ref": "#/components/schemas/FormSectionBasicInformationComponent"
                       },
                       "registrationPayload": {},
+                      "firstTimeRegistered": {
+                        "type": "boolean"
+                      },
                       "registrationStatus": {
                         "type": "string",
                         "enum": [

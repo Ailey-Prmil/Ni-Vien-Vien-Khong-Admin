@@ -19,8 +19,8 @@
       "required": true,
       "enum": [
         "Bộ Công An",
-        "Cục Cảnh sát quản lý hành chính về trật tự xã hội.",
-        "Cục Cảnh sát đăng ký quản lý cư trú và dữ liệu Quốc gia về dân cư.",
+        "Cục Cảnh sát quản lý hành chính về trật tự xã hội",
+        "Cục Cảnh sát đăng ký quản lý cư trú và dữ liệu Quốc gia về dân cư",
         "Khác"
       ]
     },
