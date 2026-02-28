@@ -91,7 +91,6 @@ export interface FormComponentFormComponent extends Struct.ComponentSchema {
     >;
     section: Schema.Attribute.Enumeration<
       [
-        'Th\u00F4ng tin c\u01A1 b\u1EA3n (Basic Information)',
         'Th\u00F4ng tin CCCD (Identity Detail)',
         'Th\u00F4ng tin tu h\u1ECDc (Monatic Detail)',
         'Th\u00F4ng tin th\u00E2n nh\u00E2n (Relation Detail)',
@@ -180,7 +179,7 @@ export interface FormSectionBasicInformation extends Struct.ComponentSchema {
     dob: Schema.Attribute.Date & Schema.Attribute.Required;
     email: Schema.Attribute.Email & Schema.Attribute.Required;
     fullName: Schema.Attribute.String & Schema.Attribute.Required;
-    gender: Schema.Attribute.Enumeration<['Nam (Male)', 'N\u1EEF (Female)']> &
+    gender: Schema.Attribute.Enumeration<['Male', 'Female']> &
       Schema.Attribute.Required;
     haveZalo: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
