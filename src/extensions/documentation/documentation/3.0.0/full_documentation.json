@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-28T00:47:37.050Z"
+    "x-generation-date": "2026-02-28T10:42:23.449Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -8803,6 +8803,9 @@
                         "$ref": "#/components/schemas/FormSectionBasicInformationComponent"
                       },
                       "registrationPayload": {},
+                      "firstTimeRegistered": {
+                        "type": "boolean"
+                      },
                       "registrationStatus": {
                         "type": "string",
                         "enum": [
@@ -9608,7 +9611,6 @@
           "section": {
             "type": "string",
             "enum": [
-              "Thông tin cơ bản (Basic Information)",
               "Thông tin CCCD (Identity Detail)",
               "Thông tin tu học (Monatic Detail)",
               "Thông tin thân nhân (Relation Detail)",
@@ -9699,8 +9701,8 @@
           "gender": {
             "type": "string",
             "enum": [
-              "Nam (Male)",
-              "Nữ (Female)"
+              "Male",
+              "Female"
             ]
           },
           "email": {

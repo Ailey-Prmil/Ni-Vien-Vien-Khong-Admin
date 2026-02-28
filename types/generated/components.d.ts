@@ -91,7 +91,6 @@ export interface FormComponentFormComponent extends Struct.ComponentSchema {
     >;
     section: Schema.Attribute.Enumeration<
       [
-        'Th\u00F4ng tin c\u01A1 b\u1EA3n (Basic Information)',
         'Th\u00F4ng tin CCCD (Identity Detail)',
         'Th\u00F4ng tin tu h\u1ECDc (Monatic Detail)',
         'Th\u00F4ng tin th\u00E2n nh\u00E2n (Relation Detail)',
@@ -180,7 +179,7 @@ export interface FormSectionBasicInformation extends Struct.ComponentSchema {
     dob: Schema.Attribute.Date & Schema.Attribute.Required;
     email: Schema.Attribute.Email & Schema.Attribute.Required;
     fullName: Schema.Attribute.String & Schema.Attribute.Required;
-    gender: Schema.Attribute.Enumeration<['Nam (Male)', 'N\u1EEF (Female)']> &
+    gender: Schema.Attribute.Enumeration<['Male', 'Female']> &
       Schema.Attribute.Required;
     haveZalo: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
@@ -201,8 +200,8 @@ export interface FormSectionIdentityDetail extends Struct.ComponentSchema {
     issueAt: Schema.Attribute.Enumeration<
       [
         'B\u1ED9 C\u00F4ng An',
-        'C\u1EE5c C\u1EA3nh s\u00E1t qu\u1EA3n l\u00FD h\u00E0nh ch\u00EDnh v\u1EC1 tr\u1EADt t\u1EF1 x\u00E3 h\u1ED9i.',
-        'C\u1EE5c C\u1EA3nh s\u00E1t \u0111\u0103ng k\u00FD qu\u1EA3n l\u00FD c\u01B0 tr\u00FA v\u00E0 d\u1EEF li\u1EC7u Qu\u1ED1c gia v\u1EC1 d\u00E2n c\u01B0.',
+        'C\u1EE5c C\u1EA3nh s\u00E1t qu\u1EA3n l\u00FD h\u00E0nh ch\u00EDnh v\u1EC1 tr\u1EADt t\u1EF1 x\u00E3 h\u1ED9i',
+        'C\u1EE5c C\u1EA3nh s\u00E1t \u0111\u0103ng k\u00FD qu\u1EA3n l\u00FD c\u01B0 tr\u00FA v\u00E0 d\u1EEF li\u1EC7u Qu\u1ED1c gia v\u1EC1 d\u00E2n c\u01B0',
         'Kh\u00E1c',
       ]
     > &

@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 
 export default {
   async beforeCreate(event) {
@@ -6,7 +6,7 @@ export default {
 
     // Auto-generate confirmation token if not present
     if (!data.confirmationToken) {
-      data.confirmationToken = uuidv4();
+      data.confirmationToken = randomUUID();
     }
     data.confirmed = false; // Always force false initially
   },

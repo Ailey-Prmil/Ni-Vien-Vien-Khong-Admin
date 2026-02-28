@@ -17,8 +17,8 @@
       "type": "enumeration",
       "required": true,
       "enum": [
-        "Nam (Male)",
-        "Nữ (Female)"
+        "Male",
+        "Female"
       ]
     },
     "email": {
@@ -32,7 +32,7 @@
     "phoneNumber": {
       "type": "string",
       "required": true,
-      "regex": "^\\+?[1-9]\\d{7,14}$"
+      "regex": "^(?:0\\d+|\\+\\d[\\d ]*)$"
     },
     "haveZalo": {
       "type": "boolean",

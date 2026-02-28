@@ -9,7 +9,6 @@
     "section": {
       "type": "enumeration",
       "enum": [
-        "Thông tin cơ bản (Basic Information)",
         "Thông tin CCCD (Identity Detail)",
         "Thông tin tu học (Monatic Detail)",
         "Thông tin thân nhân (Relation Detail)",

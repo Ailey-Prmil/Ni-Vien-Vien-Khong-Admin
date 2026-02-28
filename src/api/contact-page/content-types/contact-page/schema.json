@@ -34,7 +34,7 @@
       },
       "default": "097 446 99 63",
       "required": true,
-      "regex": "^\\+?[1-9]\\d{7,14}$"
+      "regex": "^(?:0\\d+|\\+\\d[\\d ]*)$"
     },
     "emailPrimary": {
       "type": "email",
