@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Flex, Typography } from '@strapi/design-system';
+import React from "react";
+import { Box, Flex, Typography } from "@strapi/design-system";
 
 interface PageLayoutProps {
   title: string;
@@ -24,15 +24,13 @@ export function PageLayout({
       <Box
         background="neutral0"
         paddingTop={6}
-        paddingBottom={4}
+        paddingBottom={6}
         paddingLeft={10}
         paddingRight={10}
         borderColor="neutral150"
-        style={{ borderBottom: '1px solid' }}
+        style={{ borderBottom: "2px solid" }}
       >
-        {navigationAction && (
-          <Box marginBottom={2}>{navigationAction}</Box>
-        )}
+        {navigationAction && <Box marginBottom={2}>{navigationAction}</Box>}
         <Typography variant="alpha" as="h1">
           {title}
         </Typography>
