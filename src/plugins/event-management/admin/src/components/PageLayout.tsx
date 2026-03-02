@@ -5,6 +5,7 @@ interface PageLayoutProps {
   title: string;
   subtitle?: string;
   navigationAction?: React.ReactNode;
+  primaryAction?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -16,6 +17,7 @@ export function PageLayout({
   title,
   subtitle,
   navigationAction,
+  primaryAction,
   children,
 }: PageLayoutProps) {
   return (
@@ -23,17 +25,19 @@ export function PageLayout({
       {/* Header */}
       <Box
         background="neutral0"
-        paddingTop={6}
-        paddingBottom={6}
+        paddingTop={3}
+        paddingBottom={2}
         paddingLeft={10}
         paddingRight={10}
         borderColor="neutral150"
-        style={{ borderBottom: "2px solid" }}
       >
         {navigationAction && <Box marginBottom={2}>{navigationAction}</Box>}
-        <Typography variant="alpha" as="h1">
-          {title}
-        </Typography>
+        <Flex alignItems="center" gap={3}>
+          <Typography variant="alpha" as="h1">
+            {title}
+          </Typography>
+          {primaryAction}
+        </Flex>
         {subtitle && (
           <Box marginTop={1}>
             <Typography variant="epsilon" textColor="neutral600">

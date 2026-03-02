@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
   Flex,
   NumberInput,
   Typography,
-} from '@strapi/design-system';
-import { useFetchClient, useNotification } from '@strapi/strapi/admin';
-import { PLUGIN_ID } from '../pluginId';
+} from "@strapi/design-system";
+import { useFetchClient, useNotification } from "@strapi/strapi/admin";
+import { PLUGIN_ID } from "../pluginId";
 
 interface WaitlistPromotionSectionProps {
   activityId: number;
@@ -27,8 +27,7 @@ export function WaitlistPromotionSection({
   const [count, setCount] = useState<number>(1);
   const [promoting, setPromoting] = useState(false);
 
-  const isOverCapacity =
-    availableSlots !== null && count > availableSlots;
+  const isOverCapacity = availableSlots !== null && count > availableSlots;
 
   const handlePromote = async () => {
     if (count < 1) return;
@@ -41,30 +40,32 @@ export function WaitlistPromotionSection({
       );
       const { promoted } = (res as any).data?.data ?? { promoted: 0 };
       toggleNotification({
-        type: 'success',
+        type: "success",
         message: `Promoted ${promoted} registrant(s) from the waitlist.`,
       });
       onPromoted?.();
     } catch {
       toggleNotification({
-        type: 'danger',
-        message: 'Failed to promote from waitlist.',
+        type: "danger",
+        message: "Failed to promote from waitlist.",
       });
     } finally {
       setPromoting(false);
     }
   };
 
-  const slotsLabel =
-    availableSlots === null ? '∞' : String(availableSlots);
+  const slotsLabel = availableSlots === null ? "∞" : String(availableSlots);
 
   return (
     <Box background="neutral100" padding={5} borderRadius="4px">
-      <Typography variant="beta" marginBottom={3}>
-        Promote from Waitlist
-      </Typography>
+      <Flex direction="column" gap={1} marginBottom={4}>
+        <Typography variant="beta">Promote from Waitlist</Typography>
+        <Typography variant="pi" textColor="neutral500">
+          Move registrants from the waitlist to confirmed status.
+        </Typography>
+      </Flex>
 
-      <Flex gap={6} marginBottom={4}>
+      {/* <Flex gap={6} marginBottom={4}>
         <Flex direction="column" gap={1}>
           <Typography variant="sigma" textColor="neutral500">
             Pending (waitlist)
@@ -77,14 +78,15 @@ export function WaitlistPromotionSection({
           </Typography>
           <Typography fontWeight="bold">{slotsLabel}</Typography>
         </Flex>
-      </Flex>
+      </Flex> */}
 
       <Flex gap={4} alignItems="flex-end" wrap="wrap">
-        <Box style={{ width: 200 }}>
+        <Box style={{ flex: "1 0 200px", maxWidth: "80%" }}>
           <NumberInput
-            label="How many to promote"
             value={count}
-            onValueChange={(val: number | undefined) => setCount(Math.max(1, val ?? 1))}
+            onValueChange={(val: number | undefined) =>
+              setCount(Math.max(1, val ?? 1))
+            }
             min={1}
             max={pendingCount}
             disabled={pendingCount === 0}
@@ -108,9 +110,9 @@ export function WaitlistPromotionSection({
           marginTop={4}
         >
           <Typography textColor="warning700">
-            Warning: You are promoting {count} registrant(s) but only{' '}
-            {availableSlots} slot(s) are currently available. The activity
-            will be over capacity.
+            Warning: You are promoting {count} registrant(s) but only{" "}
+            {availableSlots} slot(s) are currently available. The activity will
+            be over capacity.
           </Typography>
         </Box>
       )}

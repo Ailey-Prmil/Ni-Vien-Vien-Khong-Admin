@@ -76,9 +76,6 @@ export function ActivityStats({ stats }: ActivityStatsProps) {
 
   return (
     <Box background="neutral100" padding={5} borderRadius="4px">
-      <Typography variant="beta" marginBottom={4}>
-        Registration Statistics
-      </Typography>
       <Flex gap={4} wrap="wrap">
         <StatCard label="Total" value={stats.total} />
         <StatCard label="Active" value={stats.active} color="success600" />

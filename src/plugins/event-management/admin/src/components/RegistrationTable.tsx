@@ -454,10 +454,10 @@ export function RegistrationTable({ activityId }: RegistrationTableProps) {
     <Box background="neutral100" padding={5} borderRadius="4px">
       {/* ── Header row ── */}
       <Flex justifyContent="space-between" alignItems="center" marginBottom={4}>
-        <Flex direction="column" gap={1}>
+        <Flex direction="row" gap={5}>
           <Typography variant="beta">Registrations</Typography>
           {!loading && (
-            <Typography variant="pi" textColor="neutral500">
+            <Typography variant="omega" textColor="neutral500">
               {total} record{total !== 1 ? "s" : ""}
             </Typography>
           )}
