@@ -2,6 +2,10 @@
 
 export default ({ env }) => {
   const config: any = {
+    "event-management": {
+      enabled: true,
+      resolve: "./dist/src/plugins/event-management",
+    },
     documentation: {
       enabled: true,
       config: {
@@ -28,8 +32,14 @@ export default ({ env }) => {
           apiKey: env("RESEND_API_KEY"),
         },
         settings: {
-          defaultFrom: env("EMAIL_DEFAULT_FROM", "no-reply@contact.vienkhongni.com"),
-          defaultReplyTo: env("EMAIL_DEFAULT_REPLY_TO", "no-reply@contact.vienkhongni.com"),
+          defaultFrom: env(
+            "EMAIL_DEFAULT_FROM",
+            "no-reply@contact.vienkhongni.com",
+          ),
+          defaultReplyTo: env(
+            "EMAIL_DEFAULT_REPLY_TO",
+            "no-reply@contact.vienkhongni.com",
+          ),
         },
       },
     },

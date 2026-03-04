@@ -1,0 +1,16 @@
+{
+  "name": "event-management",
+  "version": "1.0.0",
+  "description": "Admin plugin for event registration management",
+  "strapi": {
+    "name": "event-management",
+    "displayName": "Event Management",
+    "description": "Manage activity registrations, confirmations and waitlists",
+    "kind": "plugin"
+  },
+  "exports": {
+    "./strapi-admin": "./admin/src/index.tsx",
+    "./strapi-server": "./strapi-server.js",
+    "./package.json": "./package.json"
+  }
+}

@@ -48,16 +48,6 @@
           "localized": false
         }
       },
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": ""
-            },
-            ""
-          ]
-        }
-      },
       "required": false,
       "default": "active",
       "enum": [
