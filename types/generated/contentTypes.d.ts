@@ -1317,6 +1317,57 @@ export interface ApiRitualRitual extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiRulePageRulePage extends Struct.SingleTypeSchema {
+  collectionName: 'rule_pages';
+  info: {
+    displayName: 'RulePage';
+    pluralName: 'rule-pages';
+    singularName: 'rule-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::rule-page.rule-page'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSceneryPageSceneryPage extends Struct.SingleTypeSchema {
   collectionName: 'scenery_pages';
   info: {
@@ -1996,6 +2047,7 @@ declare module '@strapi/strapi' {
       'api::notification-recipient.notification-recipient': ApiNotificationRecipientNotificationRecipient;
       'api::poem.poem': ApiPoemPoem;
       'api::ritual.ritual': ApiRitualRitual;
+      'api::rule-page.rule-page': ApiRulePageRulePage;
       'api::scenery-page.scenery-page': ApiSceneryPageSceneryPage;
       'api::user-question.user-question': ApiUserQuestionUserQuestion;
       'plugin::content-releases.release': PluginContentReleasesRelease;
