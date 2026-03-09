@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_form_component_form_templates",
+  "info": {
+    "displayName": "Form Template"
+  },
+  "options": {},
+  "attributes": {
+    "registrationDescription": {
+      "type": "blocks"
+    },
+    "defaultIdentitySectionIncluded": {
+      "type": "boolean",
+      "default": true
+    },
+    "defaultMonasticSectionIncluded": {
+      "type": "boolean",
+      "default": true
+    },
+    "defaultRelationSectionIncluded": {
+      "type": "boolean",
+      "default": false
+    },
+    "defaultRoutineSectionIncluded": {
+      "type": "boolean",
+      "default": false
+    },
+    "customizedComponents": {
+      "type": "component",
+      "component": "form-component.form-component",
+      "repeatable": true
+    },
+    "commitmentMessages": {
+      "type": "component",
+      "component": "form-component.text-input",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

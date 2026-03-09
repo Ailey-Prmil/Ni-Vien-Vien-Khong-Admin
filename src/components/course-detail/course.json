@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_course_detail_courses",
+  "info": {
+    "displayName": "Course",
+    "icon": "book"
+  },
+  "options": {},
+  "attributes": {
+    "courseCategory": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Khác",
+      "enum": [
+        "Khóa Tu Mùa Hè",
+        "Khóa Tu Xuất Gia Gieo Duyên",
+        "Khóa Thiền",
+        "Khác"
+      ]
+    },
+    "highlightedImages": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "videoSection": {
+      "type": "component",
+      "component": "course-detail.course-video",
+      "repeatable": true
+    },
+    "podcastSection": {
+      "type": "component",
+      "component": "course-detail.course-podcast",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

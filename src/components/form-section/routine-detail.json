@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_form_section_routine_details",
+  "info": {
+    "displayName": "Routine Detail"
+  },
+  "options": {},
+  "attributes": {
+    "dietaryRequirements": {
+      "type": "enumeration",
+      "enum": [
+        "Ăn chay (Vegan)",
+        "Ăn thường (Regular)"
+      ]
+    },
+    "medicalCondition": {
+      "type": "string"
+    },
+    "foodAllergies": {
+      "type": "text"
+    }
+  },
+  "config": {}
+}

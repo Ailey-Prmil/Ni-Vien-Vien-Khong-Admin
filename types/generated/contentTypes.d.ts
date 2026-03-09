@@ -430,6 +430,86 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiActivityRegistrationActivityRegistration
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'activity_registrations';
+  info: {
+    displayName: 'ActivityRegistration';
+    pluralName: 'activity-registrations';
+    singularName: 'activity-registration';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    confirmationToken: Schema.Attribute.String &
+      Schema.Attribute.Private &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
+    confirmed: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<false>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    firstTimeRegistered: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::activity-registration.activity-registration'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    registeredActivity: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::activity.activity'
+    >;
+    registrationPayload: Schema.Attribute.JSON &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
+    registrationStatus: Schema.Attribute.Enumeration<
+      ['active', 'pending', 'canceled']
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'active'>;
+    registreeData: Schema.Attribute.Component<
+      'form-section.basic-information',
+      false
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
   collectionName: 'activities';
   info: {
@@ -447,19 +527,13 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
   };
   attributes: {
     activity: Schema.Attribute.Relation<'manyToOne', 'api::activity.activity'>;
-    activityDate: Schema.Attribute.Date &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    category: Schema.Attribute.Enumeration<
+    activityCategory: Schema.Attribute.Enumeration<
       [
         'Ph\u1EADt S\u1EF1 Trong N\u01B0\u1EDBc',
         'Ph\u1EADt S\u1EF1 N\u01B0\u1EDBc Ngo\u00E0i',
         'L\u1EDBp H\u1ECDc Ph\u1EADt Ph\u00E1p',
         'Tin T\u1EE9c Kh\u00E1c',
+        'Kh\u00F3a Tu',
       ]
     > &
       Schema.Attribute.Required &
@@ -469,7 +543,44 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
         };
       }> &
       Schema.Attribute.DefaultTo<'Ph\u1EADt S\u1EF1 Trong N\u01B0\u1EDBc'>;
+    activityEndDate: Schema.Attribute.Date &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
+    activityName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    activityRegistrations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::activity-registration.activity-registration'
+    >;
+    activityStartDate: Schema.Attribute.Date &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    ageRestricted: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<false>;
     content: Schema.Attribute.Blocks &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    courseContent: Schema.Attribute.Component<'course-detail.course', false> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
@@ -485,25 +596,101 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    isEvent: Schema.Attribute.Boolean &
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::activity.activity'
+    >;
+    maxAge: Schema.Attribute.Integer &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    minAge: Schema.Attribute.Integer &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    registrationForm: Schema.Attribute.Component<
+      'form-component.form-template',
+      false
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    registrationLimit: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
         };
       }> &
-      Schema.Attribute.DefaultTo<true>;
-    locale: Schema.Attribute.String;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::activity.activity'
-    >;
-    publishedAt: Schema.Attribute.DateTime;
+      Schema.Attribute.DefaultTo<0>;
     relatedActivities: Schema.Attribute.Relation<
       'oneToMany',
       'api::activity.activity'
     >;
-    slug: Schema.Attribute.UID<'title'>;
+    slug: Schema.Attribute.UID<'activityName'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    zaloGroup: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+  };
+}
+
+export interface ApiBlogBlog extends Struct.CollectionTypeSchema {
+  collectionName: 'blogs';
+  info: {
+    displayName: 'Blog';
+    pluralName: 'blogs';
+    singularName: 'blog';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    blogContent: Schema.Attribute.Blocks &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog.blog'>;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     title: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -631,6 +818,14 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
         };
       }> &
       Schema.Attribute.DefaultTo<'nivienvienkhong2019@gmail.com'>;
+    facebookLink: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'https://www.facebook.com/Nivienvienkhong'>;
     haveSecondaryEmail: Schema.Attribute.Boolean &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -642,6 +837,14 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
       'oneToMany',
       'api::contact-page.contact-page'
     >;
+    messengerLink: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'https://m.me/Nivienvienkhong'>;
     phoneNumber: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -654,161 +857,22 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-  };
-}
-
-export interface ApiCourseRegistrationCourseRegistration
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'course_registrations';
-  info: {
-    displayName: 'CourseRegistration';
-    pluralName: 'course-registrations';
-    singularName: 'course-registration';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  pluginOptions: {
-    i18n: {
-      localized: true;
-    };
-  };
-  attributes: {
-    address: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false;
-        };
-      }>;
-    confirmed: Schema.Attribute.Boolean &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false;
-        };
-      }>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    emaiil: Schema.Attribute.Email &
+    youtubeLink: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
         };
-      }>;
-    fullName: Schema.Attribute.String &
+      }> &
+      Schema.Attribute.DefaultTo<'https://www.youtube.com/c/NiVi%E1%BB%87nVi%C3%AAnKh%C3%B4ng'>;
+    zaloLink: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
         };
-      }>;
-    locale: Schema.Attribute.String;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::course-registration.course-registration'
-    >;
-    phoneNumber: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false;
-        };
-      }>;
-    publishedAt: Schema.Attribute.DateTime;
-    registedCourse: Schema.Attribute.Relation<'oneToOne', 'api::course.course'>;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
-  collectionName: 'courses';
-  info: {
-    displayName: 'Course';
-    pluralName: 'courses';
-    singularName: 'course';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  pluginOptions: {
-    i18n: {
-      localized: true;
-    };
-  };
-  attributes: {
-    category: Schema.Attribute.Enumeration<
-      [
-        'Kh\u00F3a Tu M\u00F9a H\u00E8',
-        'Kh\u00F3a Tu Xu\u1EA5t Gia Gieo Duy\u00EAn',
-        'Kh\u00F3a Thi\u1EC1n',
-        'Kh\u00E1c',
-      ]
-    > &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    courseContent: Schema.Attribute.Blocks &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    courseName: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    courseRegistration: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::course-registration.course-registration'
-    >;
-    coverImage: Schema.Attribute.Media<'images' | 'files'> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    highlightedImages: Schema.Attribute.Media<'images' | 'files', true> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    locale: Schema.Attribute.String;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::course.course'>;
-    podcastSection: Schema.Attribute.Component<
-      'course-detail.course-podcast',
-      true
-    > &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    videoSection: Schema.Attribute.Component<
-      'course-detail.course-video',
-      true
-    > &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
+      }> &
+      Schema.Attribute.DefaultTo<'https://zalo.me/0974469963'>;
   };
 }
 
@@ -1014,12 +1078,6 @@ export interface ApiLinkedDocumentLinkedDocument
           localized: false;
         };
       }>;
-    coverImage: Schema.Attribute.Media<'images' | 'files'> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false;
-        };
-      }>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1035,6 +1093,12 @@ export interface ApiLinkedDocumentLinkedDocument
       'oneToMany',
       'api::linked-document.linked-document'
     >;
+    mindMap: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String &
       Schema.Attribute.Required &
@@ -1065,8 +1129,7 @@ export interface ApiMonasteryPageMonasteryPage extends Struct.SingleTypeSchema {
     };
   };
   attributes: {
-    content: Schema.Attribute.Text &
-      Schema.Attribute.Required &
+    content: Schema.Attribute.Blocks &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
@@ -1116,6 +1179,39 @@ export interface ApiMonasteryPageMonasteryPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiNotificationRecipientNotificationRecipient
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'notification_recipients';
+  info: {
+    displayName: 'NotificationRecipient';
+    pluralName: 'notification-recipients';
+    singularName: 'notification-recipient';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::notification-recipient.notification-recipient'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.Text & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPoemPoem extends Struct.CollectionTypeSchema {
   collectionName: 'poems';
   info: {
@@ -1132,6 +1228,12 @@ export interface ApiPoemPoem extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
+    author: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     content: Schema.Attribute.Blocks &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -1220,6 +1322,111 @@ export interface ApiRitualRitual extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiRulePageRulePage extends Struct.SingleTypeSchema {
+  collectionName: 'rule_pages';
+  info: {
+    displayName: 'RulePage';
+    pluralName: 'rule-pages';
+    singularName: 'rule-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::rule-page.rule-page'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiSceneryPageSceneryPage extends Struct.SingleTypeSchema {
+  collectionName: 'scenery_pages';
+  info: {
+    displayName: 'SceneryPage';
+    pluralName: 'scenery-pages';
+    singularName: 'scenery-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    coverImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::scenery-page.scenery-page'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'T\u1ECBnh C\u1EA3nh Vi\u00EAn Kh\u00F4ng'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiUserQuestionUserQuestion
   extends Struct.CollectionTypeSchema {
   collectionName: 'user_questions';
@@ -1238,7 +1445,7 @@ export interface ApiUserQuestionUserQuestion
   };
   attributes: {
     address: Schema.Attribute.String &
-      Schema.Attribute.Required &
+      Schema.Attribute.Private &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
@@ -1276,6 +1483,7 @@ export interface ApiUserQuestionUserQuestion
       'api::user-question.user-question'
     >;
     phoneNumber: Schema.Attribute.String &
+      Schema.Attribute.Private &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
@@ -1289,6 +1497,16 @@ export interface ApiUserQuestionUserQuestion
           localized: true;
         };
       }>;
+    questionStatus: Schema.Attribute.Enumeration<
+      ['pending', 'answered', 'rejected']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'pending'>;
     title: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -1821,18 +2039,21 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::activity-registration.activity-registration': ApiActivityRegistrationActivityRegistration;
       'api::activity.activity': ApiActivityActivity;
+      'api::blog.blog': ApiBlogBlog;
       'api::calligraphy.calligraphy': ApiCalligraphyCalligraphy;
       'api::contact-page.contact-page': ApiContactPageContactPage;
-      'api::course-registration.course-registration': ApiCourseRegistrationCourseRegistration;
-      'api::course.course': ApiCourseCourse;
       'api::history-page.history-page': ApiHistoryPageHistoryPage;
       'api::home-page.home-page': ApiHomePageHomePage;
       'api::introduction-page.introduction-page': ApiIntroductionPageIntroductionPage;
       'api::linked-document.linked-document': ApiLinkedDocumentLinkedDocument;
       'api::monastery-page.monastery-page': ApiMonasteryPageMonasteryPage;
+      'api::notification-recipient.notification-recipient': ApiNotificationRecipientNotificationRecipient;
       'api::poem.poem': ApiPoemPoem;
       'api::ritual.ritual': ApiRitualRitual;
+      'api::rule-page.rule-page': ApiRulePageRulePage;
+      'api::scenery-page.scenery-page': ApiSceneryPageSceneryPage;
       'api::user-question.user-question': ApiUserQuestionUserQuestion;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

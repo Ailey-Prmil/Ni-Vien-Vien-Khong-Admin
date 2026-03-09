@@ -1,0 +1,105 @@
+{
+  "kind": "collectionType",
+  "collectionName": "activity_registrations",
+  "info": {
+    "singularName": "activity-registration",
+    "pluralName": "activity-registrations",
+    "displayName": "ActivityRegistration"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "registreeData": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "form-section.basic-information",
+      "repeatable": false
+    },
+    "registrationPayload": {
+      "type": "json",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "firstTimeRegistered": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "registrationStatus": {
+      "type": "enumeration",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "required": false,
+      "default": "active",
+      "enum": [
+        "active",
+        "pending",
+        "canceled"
+      ]
+    },
+    "confirmed": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "registrationStatus"
+            },
+            "active"
+          ]
+        }
+      },
+      "required": false,
+      "default": false
+    },
+    "confirmationToken": {
+      "type": "string",
+      "private": true,
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "registrationStatus"
+            },
+            "active"
+          ]
+        }
+      }
+    },
+    "registeredActivity": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::activity.activity",
+      "inversedBy": "activityRegistrations"
+    }
+  }
+}

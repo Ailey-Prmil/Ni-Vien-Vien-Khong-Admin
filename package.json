@@ -16,18 +16,24 @@
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.33.4",
+    "@strapi/plugin-documentation": "^5.34.0",
     "@strapi/plugin-users-permissions": "5.33.4",
+    "@strapi/provider-email-nodemailer": "^5.34.0",
     "@strapi/strapi": "5.33.4",
     "better-sqlite3": "12.4.1",
+    "nodemailer": "^7.0.13",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
-    "styled-components": "^6.0.0"
+    "strapi-provider-email-resend": "^1.0.4",
+    "styled-components": "^6.0.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^10.0.0",
     "typescript": "^5"
   },
   "engines": {

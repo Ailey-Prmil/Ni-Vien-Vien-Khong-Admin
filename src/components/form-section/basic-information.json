@@ -1,0 +1,57 @@
+{
+  "collectionName": "components_form_section_basic_informations",
+  "info": {
+    "displayName": "Basic Information"
+  },
+  "options": {},
+  "attributes": {
+    "fullName": {
+      "type": "string",
+      "required": true
+    },
+    "dob": {
+      "type": "date",
+      "required": true
+    },
+    "gender": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "Male",
+        "Female"
+      ]
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "address": {
+      "type": "text",
+      "required": true
+    },
+    "phoneNumber": {
+      "type": "string",
+      "required": true,
+      "regex": "^(?:0\\d+|\\+\\d[\\d ]*)$"
+    },
+    "haveZalo": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "zaloName": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "haveZalo"
+            },
+            true
+          ]
+        }
+      }
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_form_component_multiple_choices",
+  "info": {
+    "displayName": "Multiple Choice"
+  },
+  "options": {},
+  "attributes": {
+    "options": {
+      "type": "component",
+      "component": "form-component.text-input",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "haveOtherValue": {
+      "type": "boolean",
+      "default": false
+    },
+    "multipleSelection": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    }
+  },
+  "config": {}
+}

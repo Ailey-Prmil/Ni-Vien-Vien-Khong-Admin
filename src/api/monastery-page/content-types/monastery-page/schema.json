@@ -39,13 +39,12 @@
       "required": true
     },
     "content": {
-      "type": "text",
+      "type": "blocks",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      },
-      "required": true
+      }
     },
     "useTemplate": {
       "type": "boolean",

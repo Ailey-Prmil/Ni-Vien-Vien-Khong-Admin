@@ -1,0 +1,52 @@
+{
+  "collectionName": "components_form_section_monastic_details",
+  "info": {
+    "displayName": "Monastic Detail"
+  },
+  "options": {},
+  "attributes": {
+    "dharmaName": {
+      "type": "string",
+      "required": true
+    },
+    "monasticRank": {
+      "type": "enumeration",
+      "enum": [
+        "Tỳ Kheo Ni",
+        "Sadini",
+        "Tu nữ",
+        "Cư sĩ nam",
+        "Cư sĩ nữ"
+      ]
+    },
+    "monasticTradition": {
+      "type": "enumeration",
+      "enum": [
+        "Nam Tông",
+        "Bắc Tông",
+        "Khất Sĩ",
+        "Khác"
+      ]
+    },
+    "otherMonasticTradition": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "monasticTradition"
+            },
+            "Khác"
+          ]
+        }
+      }
+    },
+    "currentMonastery": {
+      "type": "string"
+    },
+    "yearsOfPractice": {
+      "type": "integer"
+    }
+  },
+  "config": {}
+}

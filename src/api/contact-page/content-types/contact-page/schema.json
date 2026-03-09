@@ -34,7 +34,7 @@
       },
       "default": "097 446 99 63",
       "required": true,
-      "regex": "^\\+?[1-9]\\d{7,14}$"
+      "regex": "^(?:0\\d+|\\+\\d[\\d ]*)$"
     },
     "emailPrimary": {
       "type": "email",
@@ -72,6 +72,46 @@
         }
       },
       "default": "nivienvienkhong2019@gmail.com"
+    },
+    "facebookLink": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": "https://www.facebook.com/Nivienvienkhong",
+      "required": true
+    },
+    "youtubeLink": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": "https://www.youtube.com/c/NiVi%E1%BB%87nVi%C3%AAnKh%C3%B4ng",
+      "required": true
+    },
+    "messengerLink": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": "https://m.me/Nivienvienkhong",
+      "required": true
+    },
+    "zaloLink": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": "https://zalo.me/0974469963",
+      "required": true
     }
   }
 }
