@@ -1,10 +1,15 @@
-import { errors } from '@strapi/utils';
+import { errors } from "@strapi/utils";
 
 const { ValidationError } = errors;
 
-function assertEndAfterStart(start: string | undefined | null, end: string | undefined | null) {
-  if (start && end && end <= start) {
-    throw new ValidationError('activityEndDate must be after activityStartDate');
+function assertEndAfterStart(
+  start: string | undefined | null,
+  end: string | undefined | null,
+) {
+  if (start && end && end < start) {
+    throw new ValidationError(
+      "activityEndDate must be after activityStartDate",
+    );
   }
 }
 
@@ -29,11 +34,15 @@ export default {
     // Only one date is changing — fetch the existing record for the other.
     if (updatingStart || updatingEnd) {
       const existing = await strapi.db
-        .query('api::activity.activity')
-        .findOne({ where, select: ['activityStartDate', 'activityEndDate'] });
+        .query("api::activity.activity")
+        .findOne({ where, select: ["activityStartDate", "activityEndDate"] });
 
-      const startDate = updatingStart ? data.activityStartDate : existing?.activityStartDate;
-      const endDate = updatingEnd ? data.activityEndDate : existing?.activityEndDate;
+      const startDate = updatingStart
+        ? data.activityStartDate
+        : existing?.activityStartDate;
+      const endDate = updatingEnd
+        ? data.activityEndDate
+        : existing?.activityEndDate;
       assertEndAfterStart(startDate, endDate);
     }
   },

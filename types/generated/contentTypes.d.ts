@@ -639,6 +639,12 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    zaloGroup: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
   };
 }
 
@@ -1123,8 +1129,7 @@ export interface ApiMonasteryPageMonasteryPage extends Struct.SingleTypeSchema {
     };
   };
   attributes: {
-    content: Schema.Attribute.Text &
-      Schema.Attribute.Required &
+    content: Schema.Attribute.Blocks &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
