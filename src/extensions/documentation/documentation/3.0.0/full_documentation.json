@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-03-07T02:34:20.025Z"
+    "x-generation-date": "2026-03-09T15:55:20.066Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -7834,6 +7834,9 @@
                 ],
                 "example": "string or id"
               },
+              "zaloGroup": {
+                "type": "string"
+              },
               "activityCategory": {
                 "type": "string",
                 "enum": [
@@ -8803,6 +8806,9 @@
               }
             }
           },
+          "zaloGroup": {
+            "type": "string"
+          },
           "activityCategory": {
             "type": "string",
             "enum": [
@@ -9031,6 +9037,9 @@
                       }
                     }
                   }
+                },
+                "zaloGroup": {
+                  "type": "string"
                 },
                 "activityCategory": {
                   "type": "string",
@@ -18476,7 +18485,6 @@
           "data": {
             "required": [
               "title",
-              "content",
               "useTemplate",
               "monasteries"
             ],
@@ -18496,9 +18504,7 @@
               "title": {
                 "type": "string"
               },
-              "content": {
-                "type": "string"
-              },
+              "content": {},
               "useTemplate": {
                 "type": "boolean"
               },
@@ -18568,7 +18574,6 @@
         "type": "object",
         "required": [
           "title",
-          "content",
           "useTemplate",
           "monasteries"
         ],
@@ -19397,9 +19402,7 @@
           "title": {
             "type": "string"
           },
-          "content": {
-            "type": "string"
-          },
+          "content": {},
           "useTemplate": {
             "type": "boolean"
           },
@@ -19652,9 +19655,7 @@
                 "title": {
                   "type": "string"
                 },
-                "content": {
-                  "type": "string"
-                },
+                "content": {},
                 "useTemplate": {
                   "type": "boolean"
                 },

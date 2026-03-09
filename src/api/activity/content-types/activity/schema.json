@@ -50,6 +50,14 @@
         "files"
       ]
     },
+    "zaloGroup": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
     "activityCategory": {
       "type": "enumeration",
       "pluginOptions": {
