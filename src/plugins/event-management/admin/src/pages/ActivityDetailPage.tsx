@@ -30,6 +30,7 @@ interface Stats {
   canceled: number;
   confirmedActive: number;
   unconfirmedActive: number;
+  unsentActive: number;
   registrationLimit: number;
   availableSlots: number | null;
   oldestActiveDob: string | null;
@@ -195,7 +196,8 @@ export function ActivityDetailPage() {
           <SendConfirmationSection
             activityId={activityId}
             activeCount={stats?.active ?? 0}
-            onSent={fetchStats}
+            unsentActive={stats?.unsentActive ?? 0}
+            onSent={() => { fetchStats(); setReloadKey((k) => k + 1); }}
           />
         </Box>
       </Flex>

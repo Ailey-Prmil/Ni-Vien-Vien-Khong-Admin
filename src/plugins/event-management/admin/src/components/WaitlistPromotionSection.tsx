@@ -89,7 +89,6 @@ export function WaitlistPromotionSection({
               setCount(Math.max(1, val ?? 1))
             }
             min={1}
-            max={pendingCount}
             disabled={pendingCount === 0}
           />
         </Box>

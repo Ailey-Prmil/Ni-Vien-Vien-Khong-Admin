@@ -10,7 +10,8 @@ const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   async sendConfirmationEmails(
     activityId: number,
-  ): Promise<{ sent: number; failed: number }> {
+    { resend = false }: { resend?: boolean } = {},
+  ): Promise<{ sent: number; failed: number; skipped: number }> {
     const [activity, registrations] = await Promise.all([
       strapi.db.query(ACTIVITY_UID).findOne({
         where: { id: activityId },
@@ -32,8 +33,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     let sent = 0;
     let failed = 0;
+    let skipped = 0;
 
     for (const reg of registrations as any[]) {
+      // resend=false: skip already-sent (only send to unsent)
+      // resend=true: skip NOT-yet-sent (only re-send to already-sent)
+      if (!resend && reg.confirmationEmailSentAt) {
+        skipped++;
+        continue;
+      }
+      if (resend && !reg.confirmationEmailSentAt) {
+        skipped++;
+        continue;
+      }
+
       const email = reg.registreeData?.email ?? reg.email;
       const fullName = reg.registreeData?.fullName ?? reg.fullName ?? "";
 
@@ -43,14 +56,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
 
       try {
-        // Refresh token and set 3-day expiry
+        // Refresh token and set 3-day expiry (without marking sent yet)
         const newToken = randomUUID();
         await strapi.db.query(REGISTRATION_UID).update({
           where: { id: reg.id },
           data: {
             confirmationToken: newToken,
             tokenExpiresAt: expiresAt,
-            confirmationEmailSentAt: new Date(),
           },
         });
 
@@ -89,6 +101,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           `,
         });
 
+        // Mark as sent only after the email was successfully delivered
+        await strapi.db.query(REGISTRATION_UID).update({
+          where: { id: reg.id },
+          data: { confirmationEmailSentAt: new Date() },
+        });
+
         strapi.log.info(
           `[event-management] Confirmation email sent to ${fullName} <${email}> for activity "${activityName}"`,
         );
@@ -102,7 +120,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
     }
 
-    return { sent, failed };
+    return { sent, failed, skipped };
   },
 
   async sendWaitlistPromotionEmail({
@@ -126,7 +144,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       data: {
         confirmationToken: newToken,
         tokenExpiresAt: expiresAt,
-        confirmationEmailSentAt: new Date(),
       },
     });
 
@@ -162,6 +179,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           <p style="font-size: 12px; color: #666;">Ni Viện Viên Không</p>
         </div>
       `,
+    });
+
+    // Mark as sent only after successful delivery
+    await strapi.db.query(REGISTRATION_UID).update({
+      where: { id: registrationId },
+      data: { confirmationEmailSentAt: new Date() },
     });
 
     strapi.log.info(

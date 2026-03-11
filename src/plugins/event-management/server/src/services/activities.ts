@@ -13,6 +13,30 @@ const ACTIVITY_CATEGORIES = [
 ];
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
+  /**
+   * Given any numeric row ID (draft or published), return the published row's
+   * numeric ID for the same document. Returns the input id if already published
+   * or if no published version exists.
+   */
+  async resolvePublishedId(id: number): Promise<number> {
+    const row = (await strapi.db.query(ACTIVITY_UID).findOne({
+      where: { id },
+      select: ['id', 'documentId', 'publishedAt'],
+    })) as any;
+
+    if (!row) return id;
+    // Already the published row
+    if (row.publishedAt) return id;
+
+    // It's the draft row — find the published sibling
+    const published = (await strapi.db.query(ACTIVITY_UID).findOne({
+      where: { documentId: row.documentId, publishedAt: { $notNull: true } },
+      select: ['id'],
+    })) as any;
+
+    return published?.id ?? id;
+  },
+
   async listActivities({
     search,
     sortBy,
