@@ -31,6 +31,7 @@ const FIELD_LABELS: Record<string, string> = {
   id: "ID",
   registrationStatus: "Status",
   confirmed: "Confirmed",
+  confirmationEmailSentAt: "Email Sent",
   firstTimeRegistered: "First Timer",
   createdAt: "Registered At",
   fullName: "Full Name",
@@ -53,6 +54,7 @@ const DEFAULT_VISIBLE_FIELDS: string[] = [
   "fullName",
   "registrationStatus",
   "confirmed",
+  "confirmationEmailSentAt",
   "createdAt",
 ];
 const MAX_COLUMNS = 10;
@@ -72,6 +74,7 @@ interface Registration {
 
 interface RegistrationTableProps {
   activityId: number;
+  reloadKey?: number;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -268,7 +271,7 @@ function FieldPickerModal({
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function RegistrationTable({ activityId }: RegistrationTableProps) {
+export function RegistrationTable({ activityId, reloadKey }: RegistrationTableProps) {
   const { get } = useFetchClient();
   const { toggleNotification } = useNotification();
 
@@ -327,7 +330,7 @@ export function RegistrationTable({ activityId }: RegistrationTableProps) {
     } finally {
       setLoading(false);
     }
-  }, [activityId, statusFilter, confirmedFilter, sortBy, sortOrder, page]);
+  }, [activityId, statusFilter, confirmedFilter, sortBy, sortOrder, page, reloadKey]);
 
   useEffect(() => {
     fetchRegistrations();
@@ -413,6 +416,16 @@ export function RegistrationTable({ activityId }: RegistrationTableProps) {
         );
       case "confirmed":
         return <Typography>{confirmedLabel(reg.confirmed)}</Typography>;
+      case "confirmationEmailSentAt": {
+        const sentAt = (reg as any).confirmationEmailSentAt;
+        return (
+          <Typography textColor={sentAt ? "success600" : "neutral500"}>
+            {sentAt
+              ? new Date(sentAt).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" })
+              : "—"}
+          </Typography>
+        );
+      }
       case "firstTimeRegistered":
         return (
           <Typography>{reg.firstTimeRegistered ? "Yes" : "No"}</Typography>

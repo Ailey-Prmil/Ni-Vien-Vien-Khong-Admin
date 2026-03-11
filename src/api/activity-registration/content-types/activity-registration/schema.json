@@ -95,6 +95,23 @@
         }
       }
     },
+    "tokenExpiresAt": {
+      "type": "datetime",
+      "private": true,
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "confirmationEmailSentAt": {
+      "type": "datetime",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
     "registeredActivity": {
       "type": "relation",
       "relation": "manyToOne",

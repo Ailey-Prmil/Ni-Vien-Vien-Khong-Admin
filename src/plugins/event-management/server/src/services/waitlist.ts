@@ -5,26 +5,28 @@ const REGISTRATION_UID = 'api::activity-registration.activity-registration' as c
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
-   * Promote the oldest `count` pending (waitlist) registrations to active.
-   * FIFO order (earliest created first). Admin may request any count —
-   * capacity validation and over-promotion warnings are handled on the frontend.
-   * Sends a mock notification email to each promoted registrant.
+   * Promote the oldest `count` pending (waitlist) registrations to active (FIFO).
+   * After promoting, sends a real confirmation email with a fresh token to each.
    */
   async promoteWaitlist(
     activityId: number,
     count: number,
   ): Promise<{ promoted: number }> {
-    const pendingRegs = await strapi.entityService.findMany(REGISTRATION_UID, {
-      filters: {
+    const pendingRegs = await strapi.db.query(REGISTRATION_UID).findMany({
+      where: {
         registeredActivity: { id: activityId },
         registrationStatus: 'pending',
       },
-      sort: { createdAt: 'asc' }, // FIFO
+      orderBy: { createdAt: 'asc' }, // FIFO
       limit: count,
       populate: { registreeData: true },
     });
 
-    const activity = await strapi.entityService.findOne(ACTIVITY_UID, activityId, {});
+    const activity = await strapi.db.query(ACTIVITY_UID).findOne({
+      where: { id: activityId },
+      select: ['activityName', 'zaloGroup'],
+    });
+
     const activityName = (activity as any)?.activityName ?? '';
     const notificationsService = strapi
       .plugin('event-management')
@@ -33,16 +35,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     let promoted = 0;
 
     for (const reg of pendingRegs as any[]) {
-      await strapi.entityService.update(REGISTRATION_UID, reg.id, {
+      // 1. Change status pending → active
+      await strapi.db.query(REGISTRATION_UID).update({
+        where: { id: reg.id },
         data: { registrationStatus: 'active' },
       });
 
+      // 2. Send confirmation email with fresh token
       const email = reg.registreeData?.email;
       const fullName = reg.registreeData?.fullName;
 
       if (email) {
         try {
           await notificationsService.sendWaitlistPromotionEmail({
+            registrationId: reg.id,
             email,
             fullName,
             activityName,
