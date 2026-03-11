@@ -447,6 +447,12 @@ export interface ApiActivityRegistrationActivityRegistration
     };
   };
   attributes: {
+    confirmationEmailSentAt: Schema.Attribute.DateTime &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     confirmationToken: Schema.Attribute.String &
       Schema.Attribute.Private &
       Schema.Attribute.SetPluginOptions<{
@@ -502,6 +508,13 @@ export interface ApiActivityRegistrationActivityRegistration
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
+        };
+      }>;
+    tokenExpiresAt: Schema.Attribute.DateTime &
+      Schema.Attribute.Private &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
         };
       }>;
     updatedAt: Schema.Attribute.DateTime;

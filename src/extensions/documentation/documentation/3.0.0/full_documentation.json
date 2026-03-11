@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-03-09T15:55:20.066Z"
+    "x-generation-date": "2026-03-11T08:01:26.413Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -9151,6 +9151,14 @@
                       },
                       "confirmationToken": {
                         "type": "string"
+                      },
+                      "tokenExpiresAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "confirmationEmailSentAt": {
+                        "type": "string",
+                        "format": "date-time"
                       },
                       "registeredActivity": {
                         "type": "object",

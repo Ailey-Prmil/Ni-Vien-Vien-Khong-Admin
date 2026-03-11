@@ -1,77 +1,68 @@
 import { randomUUID } from "crypto";
 
+const ACTIVITY_UID = "api::activity.activity" as const;
+const REGISTRATION_UID =
+  "api::activity-registration.activity-registration" as const;
+
 export default {
   async beforeCreate(event) {
     const { data } = event.params;
 
-    // Auto-generate confirmation token if not present
+    // Always generate a fresh token and start unconfirmed
     if (!data.confirmationToken) {
       data.confirmationToken = randomUUID();
     }
-    data.confirmed = false; // Always force false initially
-  },
+    data.confirmed = false;
 
-  async afterCreate(event) {
-    const { result } = event;
+    // ── Determine registrationStatus based on capacity + category rules ──
+    // Strapi v5 sends relation as { set: [{ id: N }] } from the REST API
+    const activityId =
+      data.registeredActivity?.connect?.[0]?.id ??
+      data.registeredActivity?.set?.[0]?.id ??
+      data.registeredActivity?.id ??
+      (typeof data.registeredActivity === "number" ? data.registeredActivity : undefined);
 
-    try {
-      if (!result.email) {
-        console.warn(
-          "[ActivityRegistration] No email found for registration ID:",
-          result.id,
-        );
+    if (!activityId) {
+      // No activity linked — fall back to schema default
+      return;
+    }
+
+    const activity = await strapi.db.query(ACTIVITY_UID).findOne({
+      where: { id: activityId },
+      select: ["registrationLimit", "activityCategory"],
+    });
+
+    if (!activity) return;
+
+    const { registrationLimit, activityCategory } = activity as any;
+
+    // Rule 1 — Khóa Tu: non-first-timers always go to pending
+    if (activityCategory === "Khóa Tu" && data.firstTimeRegistered === false) {
+      data.registrationStatus = "pending";
+      return;
+    }
+
+    // Rule 2 — Capacity check (registrationLimit = 0 means unlimited)
+    if (registrationLimit > 0) {
+      const activeRegs = await strapi.db.query(REGISTRATION_UID).findMany({
+        where: { registrationStatus: "active" },
+        populate: { registeredActivity: true },
+      });
+      const activeCount = (activeRegs as any[]).filter(
+        (r) => r.registeredActivity?.id === activityId,
+      ).length;
+
+      strapi.log.info(
+        `[lifecycle] activity=${activityId} limit=${registrationLimit} activeCount=${activeCount}`,
+      );
+
+      if (activeCount >= registrationLimit) {
+        data.registrationStatus = "pending";
         return;
       }
-
-      // Construct the confirmation URL - points to backend API
-      // The backend will handle confirmation and redirect to frontend
-      const backendUrl =
-        process.env.STRAPI_ADMIN_URL || "http://localhost:1337";
-      const confirmationLink = `${backendUrl}/api/activity-registrations/confirm?code=${result.confirmationToken}`;
-
-      // Debug logging
-      // console.log('[ActivityRegistration] ========== EMAIL DEBUG ==========');
-      // console.log('[ActivityRegistration] STRAPI_ADMIN_URL env:', process.env.STRAPI_ADMIN_URL);
-      // console.log('[ActivityRegistration] backendUrl used:', backendUrl);
-      // console.log('[ActivityRegistration] confirmationToken:', result.confirmationToken);
-      // console.log('[ActivityRegistration] FULL confirmationLink:', confirmationLink);
-      // console.log('[ActivityRegistration] ================================');
-
-      await strapi.plugins["email"].services.email.send({
-        to: result.email,
-        from: process.env.SMTP_DEFAULT_FROM || process.env.EMAIL_DEFAULT_FROM,
-        subject: `Xác nhận đăng ký khóa tu - Ni Viện Viên Không`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #8B4513;">Xác nhận đăng ký khóa tu</h2>
-            <p>Xin chào <strong>${result.fullName}</strong>,</p>
-            <p>Chúng tôi đã nhận được yêu cầu đăng ký của bạn. Để hoàn tất việc đăng ký, vui lòng nhấn vào nút xác nhận bên dưới:</p>
-            
-            <p style="text-align: center; margin: 30px 0;">
-              <a href="${confirmationLink}" 
-                 style="background-color: #8B4513; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                Xác nhận đăng ký
-              </a>
-            </p>
-
-            <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
-            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-            <p style="font-size: 12px; color: #666;">Ni Viện Viên Không</p>
-          </div>
-        `,
-      });
-
-      console.log(
-        `[ActivityRegistration] DEBUG: Confirmation Link: ${confirmationLink}`,
-      );
-      console.log(
-        `[ActivityRegistration] Confirmation email sent to ${result.email}. ID: ${result.id}`,
-      );
-    } catch (error) {
-      console.error(
-        "[ActivityRegistration] Error sending confirmation email:",
-        error,
-      );
     }
+
+    // Default — slot available
+    data.registrationStatus = "active";
   },
 };

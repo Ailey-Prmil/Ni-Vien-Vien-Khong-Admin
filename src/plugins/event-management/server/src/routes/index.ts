@@ -51,6 +51,12 @@ export default {
         handler: "event-management.promoteWaitlist",
         config: { policies: ["admin::isAuthenticatedAdmin"] },
       },
+      {
+        method: "POST",
+        path: "/registrations/:registrationId/promote",
+        handler: "event-management.promoteRegistration",
+        config: { policies: ["admin::isAuthenticatedAdmin"] },
+      },
     ],
   },
 };

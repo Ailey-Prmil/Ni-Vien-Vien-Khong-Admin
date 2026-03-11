@@ -10,10 +10,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         where: { id: activityId },
         select: ['registrationLimit'],
       }),
-      strapi.entityService.findMany(REGISTRATION_UID, {
-        filters: { registeredActivity: { id: activityId } },
-        fields: ['registrationStatus', 'confirmed'],
-        populate: { registreeData: { fields: ['dob'] } },
+      strapi.db.query(REGISTRATION_UID).findMany({
+        where: { registeredActivity: { id: activityId } },
+        select: ['registrationStatus', 'confirmed', 'confirmationEmailSentAt'],
+        populate: { registreeData: true },
       }),
     ]);
 
@@ -25,6 +25,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       (r) => r.registrationStatus === 'active' && r.confirmed === true,
     ).length;
     const unconfirmedActive = active - confirmedActive;
+    const unsentActive = (all as any[]).filter(
+      (r) => r.registrationStatus === 'active' && !r.confirmationEmailSentAt,
+    ).length;
 
     const registrationLimit = (activity as any)?.registrationLimit ?? 0;
     const availableSlots =
@@ -49,6 +52,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       canceled,
       confirmedActive,
       unconfirmedActive,
+      unsentActive,
       registrationLimit,
       availableSlots,
       oldestActiveDob,

@@ -21,7 +21,7 @@ import {
   Typography,
 } from "@strapi/design-system";
 import { useFetchClient, useNotification } from "@strapi/strapi/admin";
-import { Download, Cog } from "@strapi/icons";
+import { Download, Cog, ArrowUp } from "@strapi/icons";
 import { PLUGIN_ID } from "../pluginId";
 
 // ── Column definitions ────────────────────────────────────────────────────────
@@ -31,6 +31,7 @@ const FIELD_LABELS: Record<string, string> = {
   id: "ID",
   registrationStatus: "Status",
   confirmed: "Confirmed",
+  confirmationEmailSentAt: "Email Sent",
   firstTimeRegistered: "First Timer",
   createdAt: "Registered At",
   fullName: "Full Name",
@@ -53,6 +54,7 @@ const DEFAULT_VISIBLE_FIELDS: string[] = [
   "fullName",
   "registrationStatus",
   "confirmed",
+  "confirmationEmailSentAt",
   "createdAt",
 ];
 const MAX_COLUMNS = 10;
@@ -72,6 +74,7 @@ interface Registration {
 
 interface RegistrationTableProps {
   activityId: number;
+  reloadKey?: number;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -268,8 +271,8 @@ function FieldPickerModal({
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function RegistrationTable({ activityId }: RegistrationTableProps) {
-  const { get } = useFetchClient();
+export function RegistrationTable({ activityId, reloadKey }: RegistrationTableProps) {
+  const { get, post } = useFetchClient();
   const { toggleNotification } = useNotification();
 
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -297,6 +300,27 @@ export function RegistrationTable({ activityId }: RegistrationTableProps) {
   // Export field picker
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
+
+  // Per-row promoting state
+  const [promotingId, setPromotingId] = useState<number | null>(null);
+
+  const handlePromoteRow = async (registrationId: number) => {
+    setPromotingId(registrationId);
+    try {
+      await post(`/${PLUGIN_ID}/registrations/${registrationId}/promote`, {});
+      toggleNotification({ type: "success", message: "Registration promoted to active." });
+      fetchRegistrations();
+    } catch (err: any) {
+      const msg = err?.response?.data?.error?.message ?? err?.message ?? "";
+      if (msg.includes("No available slots")) {
+        toggleNotification({ type: "danger", message: "No available slots — increase the registration limit first." });
+      } else {
+        toggleNotification({ type: "danger", message: "Failed to promote registration." });
+      }
+    } finally {
+      setPromotingId(null);
+    }
+  };
 
   const fetchRegistrations = useCallback(async () => {
     setLoading(true);
@@ -327,7 +351,7 @@ export function RegistrationTable({ activityId }: RegistrationTableProps) {
     } finally {
       setLoading(false);
     }
-  }, [activityId, statusFilter, confirmedFilter, sortBy, sortOrder, page]);
+  }, [activityId, statusFilter, confirmedFilter, sortBy, sortOrder, page, reloadKey]);
 
   useEffect(() => {
     fetchRegistrations();
@@ -413,6 +437,16 @@ export function RegistrationTable({ activityId }: RegistrationTableProps) {
         );
       case "confirmed":
         return <Typography>{confirmedLabel(reg.confirmed)}</Typography>;
+      case "confirmationEmailSentAt": {
+        const sentAt = (reg as any).confirmationEmailSentAt;
+        return (
+          <Typography textColor={sentAt ? "success600" : "neutral500"}>
+            {sentAt
+              ? new Date(sentAt).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" })
+              : "—"}
+          </Typography>
+        );
+      }
       case "firstTimeRegistered":
         return (
           <Typography>{reg.firstTimeRegistered ? "Yes" : "No"}</Typography>
@@ -542,7 +576,7 @@ export function RegistrationTable({ activityId }: RegistrationTableProps) {
           <Typography>No registrations found.</Typography>
         </Box>
       ) : (
-        <Table colCount={visibleColumns.length} rowCount={registrations.length}>
+        <Table colCount={visibleColumns.length + 1} rowCount={registrations.length}>
           <Thead>
             <Tr>
               {visibleColumns.map((col) => (
@@ -550,6 +584,9 @@ export function RegistrationTable({ activityId }: RegistrationTableProps) {
                   <Typography variant="sigma">{fieldLabel(col)}</Typography>
                 </Th>
               ))}
+              <Th>
+                <Typography variant="sigma">Actions</Typography>
+              </Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -558,6 +595,20 @@ export function RegistrationTable({ activityId }: RegistrationTableProps) {
                 {visibleColumns.map((col) => (
                   <Td key={col}>{renderCell(reg, col)}</Td>
                 ))}
+                <Td>
+                  {reg.registrationStatus === "pending" && (
+                    <Button
+                      size="S"
+                      variant="secondary"
+                      startIcon={<ArrowUp />}
+                      loading={promotingId === reg.id}
+                      disabled={promotingId !== null}
+                      onClick={() => handlePromoteRow(reg.id)}
+                    >
+                      Promote
+                    </Button>
+                  )}
+                </Td>
               </Tr>
             ))}
           </Tbody>
