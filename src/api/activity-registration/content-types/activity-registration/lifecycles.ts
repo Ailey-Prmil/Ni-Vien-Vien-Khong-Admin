@@ -44,22 +44,32 @@ export default {
 
     // Rule 2 — Capacity check (registrationLimit = 0 means unlimited)
     if (registrationLimit > 0) {
-      const activeRegs = await strapi.db.query(REGISTRATION_UID).findMany({
-        where: { registrationStatus: "active" },
-        populate: { registeredActivity: true },
+      await strapi.db.transaction(async () => {
+        // Lock the activity row to prevent concurrent registrations from
+        // reading a stale count and both slipping under the limit
+        await strapi.db
+          .getConnection("activities")
+          .where({ id: activityId })
+          .forUpdate();
+
+        const activeCount = await strapi.db.query(REGISTRATION_UID).count({
+          where: {
+            registrationStatus: "active",
+            registeredActivity: { id: activityId },
+          },
+        });
+
+        strapi.log.info(
+          `[lifecycle] activity=${activityId} limit=${registrationLimit} activeCount=${activeCount}`,
+        );
+
+        if (activeCount >= registrationLimit) {
+          data.registrationStatus = "pending";
+        } else {
+          data.registrationStatus = "active";
+        }
       });
-      const activeCount = (activeRegs as any[]).filter(
-        (r) => r.registeredActivity?.id === activityId,
-      ).length;
-
-      strapi.log.info(
-        `[lifecycle] activity=${activityId} limit=${registrationLimit} activeCount=${activeCount}`,
-      );
-
-      if (activeCount >= registrationLimit) {
-        data.registrationStatus = "pending";
-        return;
-      }
+      return;
     }
 
     // Default — slot available
