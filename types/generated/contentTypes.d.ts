@@ -556,7 +556,7 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
         };
       }> &
       Schema.Attribute.DefaultTo<'Ph\u1EADt S\u1EF1 Trong N\u01B0\u1EDBc'>;
-    activityEndDate: Schema.Attribute.Date &
+    activityEndDate: Schema.Attribute.DateTime &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
@@ -573,7 +573,7 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::activity-registration.activity-registration'
     >;
-    activityStartDate: Schema.Attribute.Date &
+    activityStartDate: Schema.Attribute.DateTime &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {

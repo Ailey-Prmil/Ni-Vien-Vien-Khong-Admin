@@ -131,7 +131,7 @@
       }
     },
     "activityStartDate": {
-      "type": "date",
+      "type": "datetime",
       "pluginOptions": {
         "i18n": {
           "localized": true
@@ -140,7 +140,7 @@
       "required": true
     },
     "activityEndDate": {
-      "type": "date",
+      "type": "datetime",
       "pluginOptions": {
         "i18n": {
           "localized": false
