@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-03-11T08:01:26.413Z"
+    "x-generation-date": "2026-03-15T14:20:04.609Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -7861,11 +7861,11 @@
               },
               "activityStartDate": {
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               },
               "activityEndDate": {
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               },
               "courseContent": {
                 "$ref": "#/components/schemas/CourseDetailCourseComponent"
@@ -8833,11 +8833,11 @@
           },
           "activityStartDate": {
             "type": "string",
-            "format": "date"
+            "format": "date-time"
           },
           "activityEndDate": {
             "type": "string",
-            "format": "date"
+            "format": "date-time"
           },
           "courseContent": {
             "$ref": "#/components/schemas/CourseDetailCourseComponent"
@@ -9065,11 +9065,11 @@
                 },
                 "activityStartDate": {
                   "type": "string",
-                  "format": "date"
+                  "format": "date-time"
                 },
                 "activityEndDate": {
                   "type": "string",
-                  "format": "date"
+                  "format": "date-time"
                 },
                 "courseContent": {
                   "$ref": "#/components/schemas/CourseDetailCourseComponent"
