@@ -17,7 +17,7 @@ const eventManagementPlugin = {
         id: `${PLUGIN_ID}.plugin.name`,
         defaultMessage: "Event Management",
       },
-      permissions: [],
+      permissions: [{ action: "plugin::event-management.read" }],
       Component: () =>
         import("./pages/App").then((mod) => ({ default: mod.App })),
     });
