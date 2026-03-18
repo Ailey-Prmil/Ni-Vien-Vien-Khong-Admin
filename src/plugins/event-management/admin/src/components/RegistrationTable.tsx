@@ -20,7 +20,7 @@ import {
   Tr,
   Typography,
 } from "@strapi/design-system";
-import { useFetchClient, useNotification } from "@strapi/strapi/admin";
+import { useFetchClient, useNotification, useRBAC } from "@strapi/strapi/admin";
 import { Download, Cog, ArrowUp } from "@strapi/icons";
 import { PLUGIN_ID } from "../pluginId";
 
@@ -274,6 +274,10 @@ function FieldPickerModal({
 export function RegistrationTable({ activityId, reloadKey }: RegistrationTableProps) {
   const { get, post } = useFetchClient();
   const { toggleNotification } = useNotification();
+  const { allowedActions } = useRBAC({
+    canExport: [{ action: "plugin::event-management.export" }],
+    canManageWaitlist: [{ action: "plugin::event-management.manage-waitlist" }],
+  });
 
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(false);
@@ -497,22 +501,26 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
           )}
         </Flex>
         <Flex gap={2}>
-          <Button
-            variant="ghost"
-            startIcon={<Cog />}
-            onClick={handleOpenColumnPicker}
-            loading={loadingFields}
-          >
-            Columns
-          </Button>
-          <Button
-            variant="secondary"
-            startIcon={<Download />}
-            onClick={handleOpenExport}
-            loading={loadingFields}
-          >
-            Export CSV
-          </Button>
+          {allowedActions.canExport && (
+            <>
+              <Button
+                variant="ghost"
+                startIcon={<Cog />}
+                onClick={handleOpenColumnPicker}
+                loading={loadingFields}
+              >
+                Columns
+              </Button>
+              <Button
+                variant="secondary"
+                startIcon={<Download />}
+                onClick={handleOpenExport}
+                loading={loadingFields}
+              >
+                Export CSV
+              </Button>
+            </>
+          )}
         </Flex>
       </Flex>
 
@@ -596,7 +604,7 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
                   <Td key={col}>{renderCell(reg, col)}</Td>
                 ))}
                 <Td>
-                  {reg.registrationStatus === "pending" && (
+                  {allowedActions.canManageWaitlist && reg.registrationStatus === "pending" && (
                     <Button
                       size="S"
                       variant="secondary"

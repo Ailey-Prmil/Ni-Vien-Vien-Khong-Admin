@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Button, Flex, Typography } from "@strapi/design-system";
-import { useFetchClient, useNotification } from "@strapi/strapi/admin";
+import { useFetchClient, useNotification, useRBAC } from "@strapi/strapi/admin";
 import { PLUGIN_ID } from "../pluginId";
 
 interface SendConfirmationSectionProps {
@@ -18,7 +18,12 @@ export function SendConfirmationSection({
 }: SendConfirmationSectionProps) {
   const { post } = useFetchClient();
   const { toggleNotification } = useNotification();
+  const { allowedActions } = useRBAC({
+    canSendConfirmations: [{ action: "plugin::event-management.send-confirmations" }],
+  });
   const [sending, setSending] = useState(false);
+
+  if (!allowedActions.canSendConfirmations) return null;
 
   const handleSend = async (resend = false) => {
     setSending(true);
@@ -58,10 +63,15 @@ export function SendConfirmationSection({
         <Typography textColor="neutral600" marginBottom={2}>
           {unsentActive > 0 ? (
             <>
-              <strong>{unsentActive}</strong> active registrant{unsentActive !== 1 ? "s" : ""} have not received a confirmation email yet.
+              <strong>{unsentActive}</strong> active registrant
+              {unsentActive !== 1 ? "s" : ""} have not received a confirmation
+              email yet.
             </>
           ) : activeCount > 0 ? (
-            <>All <strong>{activeCount}</strong> active registrant{activeCount !== 1 ? "s" : ""} have already been emailed.</>
+            <>
+              All <strong>{activeCount}</strong> active registrant
+              {activeCount !== 1 ? "s" : ""} have already been emailed.
+            </>
           ) : (
             <>No active registrants.</>
           )}
@@ -72,7 +82,8 @@ export function SendConfirmationSection({
           loading={sending}
           disabled={unsentActive === 0 || sending}
         >
-          Send to {unsentActive} unsent registrant{unsentActive !== 1 ? "s" : ""}
+          Send to {unsentActive} unsent registrant
+          {unsentActive !== 1 ? "s" : ""}
         </Button>
 
         {alreadySentCount > 0 && (
@@ -83,7 +94,8 @@ export function SendConfirmationSection({
               loading={sending}
               disabled={alreadySentCount === 0 || sending}
             >
-              Resend to {alreadySentCount} already-emailed registrant{alreadySentCount !== 1 ? "s" : ""}
+              Resend to {alreadySentCount} already-emailed registrant
+              {alreadySentCount !== 1 ? "s" : ""}
             </Button>
           </Box>
         )}

@@ -6,7 +6,7 @@ import {
   NumberInput,
   Typography,
 } from "@strapi/design-system";
-import { useFetchClient, useNotification } from "@strapi/strapi/admin";
+import { useFetchClient, useNotification, useRBAC } from "@strapi/strapi/admin";
 import { PLUGIN_ID } from "../pluginId";
 
 interface WaitlistPromotionSectionProps {
@@ -24,8 +24,13 @@ export function WaitlistPromotionSection({
 }: WaitlistPromotionSectionProps) {
   const { post } = useFetchClient();
   const { toggleNotification } = useNotification();
+  const { allowedActions } = useRBAC({
+    canManageWaitlist: [{ action: "plugin::event-management.manage-waitlist" }],
+  });
   const [count, setCount] = useState<number>(1);
   const [promoting, setPromoting] = useState(false);
+
+  if (!allowedActions.canManageWaitlist) return null;
 
   const noSlotsAvailable = availableSlots !== null && availableSlots === 0;
   const isOverCapacity = availableSlots !== null && availableSlots > 0 && count > availableSlots;
