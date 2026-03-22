@@ -127,24 +127,13 @@ export default {
     console.log(`[UserQuestion] afterCreate triggered. ID: ${executionId}, Result ID: ${result.id}, Locale: ${result.locale}, PublishedAt: ${result.publishedAt}`);
 
     try {
-      // Only send email when the question is PUBLISHED (has a publishedAt date)
-      // Strapi's Draft & Publish system triggers afterCreate twice: once for Draft (null), once for Published (date).
-      // We ignore the Draft event to avoid duplicate emails.
-      if (!result.publishedAt) {
-        console.log(`[UserQuestion] Skipping Draft entry. ID: ${executionId}, Result ID: ${result.id}`);
-        return;
-      }
-
       // Fetch notification recipients from the collection
-      const recipients = await strapi.entityService.findMany(
-        'api::notification-recipient.notification-recipient',
-        {
-          filters: {
-            isActive: true,
-          },
-          fields: ['email', 'name'],
-        }
-      );
+      const recipients = await strapi.db.query(
+        'api::notification-recipient.notification-recipient'
+      ).findMany({
+        where: { isActive: true },
+        select: ['email', 'name'],
+      });
 
       // Handle case where no recipients are configured
       if (!recipients || recipients.length === 0) {

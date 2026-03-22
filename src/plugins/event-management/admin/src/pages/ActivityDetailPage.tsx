@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Flex, Typography } from "@strapi/design-system";
-import { ArrowLeft } from "@strapi/icons";
+import { ArrowLeft, ArrowClockwise } from "@strapi/icons";
 import { useFetchClient, useNotification } from "@strapi/strapi/admin";
 import { PLUGIN_ID } from "../pluginId";
 import { PageLayout } from "../components/PageLayout";
@@ -30,6 +30,7 @@ interface Stats {
   canceled: number;
   confirmedActive: number;
   unconfirmedActive: number;
+  unsentActive: number;
   registrationLimit: number;
   availableSlots: number | null;
   oldestActiveDob: string | null;
@@ -61,6 +62,7 @@ export function ActivityDetailPage() {
   const [activity, setActivity] = useState<Activity | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loadingActivity, setLoadingActivity] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const fetchActivity = useCallback(async () => {
     try {
@@ -142,18 +144,30 @@ export function ActivityDetailPage() {
         </Button>
       }
       primaryAction={
-        <span
-          style={{
-            ...statusStyle,
-            padding: "8px 20px",
-            borderRadius: 4,
-            fontWeight: 700,
-            fontSize: 15,
-            letterSpacing: "0.5px",
-          }}
-        >
-          {activityStatus}
-        </span>
+        <Flex gap={3} alignItems="center">
+          <Button
+            variant="secondary"
+            startIcon={<ArrowClockwise />}
+            onClick={() => {
+              fetchStats();
+              setReloadKey((k) => k + 1);
+            }}
+          >
+            Reload
+          </Button>
+          <span
+            style={{
+              ...statusStyle,
+              padding: "8px 20px",
+              borderRadius: 4,
+              fontWeight: 700,
+              fontSize: 15,
+              letterSpacing: "0.5px",
+            }}
+          >
+            {activityStatus}
+          </span>
+        </Flex>
       }
     >
       {/* ── Registration Statistics ── */}
@@ -170,7 +184,7 @@ export function ActivityDetailPage() {
             activityId={activityId}
             pendingCount={stats?.pending ?? 0}
             availableSlots={stats?.availableSlots ?? null}
-            onPromoted={fetchStats}
+            onPromoted={() => { fetchStats(); setReloadKey((k) => k + 1); }}
           />
         </Box>
         <Box
@@ -182,14 +196,15 @@ export function ActivityDetailPage() {
           <SendConfirmationSection
             activityId={activityId}
             activeCount={stats?.active ?? 0}
-            onSent={fetchStats}
+            unsentActive={stats?.unsentActive ?? 0}
+            onSent={() => { fetchStats(); setReloadKey((k) => k + 1); }}
           />
         </Box>
       </Flex>
 
       {/* ── Registration Table ── */}
       <Box marginBottom={6}>
-        <RegistrationTable activityId={activityId} />
+        <RegistrationTable activityId={activityId} reloadKey={reloadKey} />
       </Box>
     </PageLayout>
   );

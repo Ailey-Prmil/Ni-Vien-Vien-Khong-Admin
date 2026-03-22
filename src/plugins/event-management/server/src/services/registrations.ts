@@ -56,8 +56,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     if (status) filters.registrationStatus = { $eq: status };
     if (confirmed !== undefined) filters.confirmed = { $eq: confirmed };
 
-    const all = await strapi.entityService.findMany(REGISTRATION_UID, {
-      filters,
+    const all = await strapi.db.query(REGISTRATION_UID).findMany({
+      where: filters,
       populate: { registreeData: true },
     });
 
@@ -73,9 +73,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   async getAllForActivity(activityId: number) {
-    return strapi.entityService.findMany(REGISTRATION_UID, {
-      filters: { registeredActivity: { id: activityId } },
-      sort: { createdAt: 'asc' },
+    return strapi.db.query(REGISTRATION_UID).findMany({
+      where: { registeredActivity: { id: activityId } },
+      orderBy: { createdAt: 'asc' },
       populate: { registreeData: true },
     });
   },

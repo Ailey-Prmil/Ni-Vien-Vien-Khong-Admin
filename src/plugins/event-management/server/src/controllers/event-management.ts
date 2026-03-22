@@ -27,13 +27,15 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
     },
 
     async getStats(ctx: any) {
-      const id = Number(ctx.params.id);
+      const rawId = Number(ctx.params.id);
+      const id = await svc('activities').resolvePublishedId(rawId);
       const data = await svc('stats').getStats(id);
       ctx.body = { data };
     },
 
     async listRegistrations(ctx: any) {
-      const id = Number(ctx.params.id);
+      const rawId = Number(ctx.params.id);
+      const id = await svc('activities').resolvePublishedId(rawId);
       const { status, sortBy, sortOrder } = ctx.query;
       const page = ctx.query.page ? Number(ctx.query.page) : 1;
       const pageSize = ctx.query.pageSize ? Number(ctx.query.pageSize) : 20;
@@ -54,13 +56,15 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
     },
 
     async getAvailableFields(ctx: any) {
-      const id = Number(ctx.params.id);
+      const rawId = Number(ctx.params.id);
+      const id = await svc('activities').resolvePublishedId(rawId);
       const fields = await svc('registrations').getAvailableFields(id);
       ctx.body = { data: fields };
     },
 
     async exportCsv(ctx: any) {
-      const id = Number(ctx.params.id);
+      const rawId = Number(ctx.params.id);
+      const id = await svc('activities').resolvePublishedId(rawId);
 
       // ?fields=field1,field2,field3  — comma-separated list of selected fields
       const rawFields = ctx.query.fields as string | undefined;
@@ -75,13 +79,29 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
     },
 
     async sendConfirmationEmails(ctx: any) {
-      const id = Number(ctx.params.id);
-      const result = await svc('notifications').sendConfirmationEmails(id);
+      const rawId = Number(ctx.params.id);
+      const id = await svc('activities').resolvePublishedId(rawId);
+      const resend = ctx.request.body?.data?.resend === true;
+      const result = await svc('notifications').sendConfirmationEmails(id, { resend });
+      ctx.body = { data: result };
+    },
+
+    async promoteRegistration(ctx: any) {
+      const registrationId = Number(ctx.params.registrationId);
+      if (!Number.isInteger(registrationId) || registrationId < 1) {
+        return ctx.badRequest('`registrationId` must be a positive integer');
+      }
+      const result = await svc('waitlist').promoteRegistration(registrationId);
+      if ('error' in result) {
+        if (result.error === 'not_found') return ctx.notFound('Registration not found or not pending');
+        if (result.error === 'no_slots') return ctx.badRequest('No available slots — increase the registration limit first');
+      }
       ctx.body = { data: result };
     },
 
     async promoteWaitlist(ctx: any) {
-      const id = Number(ctx.params.id);
+      const rawId = Number(ctx.params.id);
+      const id = await svc('activities').resolvePublishedId(rawId);
       const count = Number(ctx.request.body?.data?.count);
 
       if (!Number.isInteger(count) || count < 1) {

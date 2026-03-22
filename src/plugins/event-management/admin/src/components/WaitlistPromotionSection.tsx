@@ -6,7 +6,7 @@ import {
   NumberInput,
   Typography,
 } from "@strapi/design-system";
-import { useFetchClient, useNotification } from "@strapi/strapi/admin";
+import { useFetchClient, useNotification, useRBAC } from "@strapi/strapi/admin";
 import { PLUGIN_ID } from "../pluginId";
 
 interface WaitlistPromotionSectionProps {
@@ -24,10 +24,16 @@ export function WaitlistPromotionSection({
 }: WaitlistPromotionSectionProps) {
   const { post } = useFetchClient();
   const { toggleNotification } = useNotification();
+  const { allowedActions } = useRBAC({
+    canManageWaitlist: [{ action: "plugin::event-management.manage-waitlist" }],
+  });
   const [count, setCount] = useState<number>(1);
   const [promoting, setPromoting] = useState(false);
 
-  const isOverCapacity = availableSlots !== null && count > availableSlots;
+  if (!allowedActions.canManageWaitlist) return null;
+
+  const noSlotsAvailable = availableSlots !== null && availableSlots === 0;
+  const isOverCapacity = availableSlots !== null && availableSlots > 0 && count > availableSlots;
 
   const handlePromote = async () => {
     if (count < 1) return;
@@ -88,20 +94,32 @@ export function WaitlistPromotionSection({
               setCount(Math.max(1, val ?? 1))
             }
             min={1}
-            max={pendingCount}
             disabled={pendingCount === 0}
           />
         </Box>
         <Button
           onClick={handlePromote}
           loading={promoting}
-          disabled={pendingCount === 0 || count < 1}
+          disabled={pendingCount === 0 || count < 1 || noSlotsAvailable}
         >
           Promote {count} from waitlist
         </Button>
       </Flex>
 
-      {/* Over-capacity warning shown on the frontend */}
+      {noSlotsAvailable && (
+        <Box
+          background="danger100"
+          padding={3}
+          borderRadius="4px"
+          marginTop={4}
+        >
+          <Typography textColor="danger700">
+            No slots available. Increase the registration limit before promoting
+            from the waitlist.
+          </Typography>
+        </Box>
+      )}
+
       {isOverCapacity && (
         <Box
           background="warning100"
