@@ -84,7 +84,10 @@ export interface FormComponentFormComponent extends Struct.ComponentSchema {
     icon: 'connector';
   };
   attributes: {
-    label: Schema.Attribute.String;
+    isRequired: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    label: Schema.Attribute.String & Schema.Attribute.Required;
     multipleChoiceDetails: Schema.Attribute.Component<
       'form-component.multiple-choice',
       false
@@ -97,7 +100,8 @@ export interface FormComponentFormComponent extends Struct.ComponentSchema {
         'Th\u00F4ng tin sinh ho\u1EA1t (Routine Detail)',
         'Th\u00F4ng tin kh\u00E1c (Others)',
       ]
-    >;
+    > &
+      Schema.Attribute.DefaultTo<'Th\u00F4ng tin kh\u00E1c (Others)'>;
     type: Schema.Attribute.Enumeration<
       [
         'short text',
