@@ -8,6 +8,7 @@
   "attributes": {
     "section": {
       "type": "enumeration",
+      "default": "Thông tin khác (Others)",
       "enum": [
         "Thông tin CCCD (Identity Detail)",
         "Thông tin tu học (Monatic Detail)",
@@ -17,7 +18,13 @@
       ]
     },
     "label": {
-      "type": "string"
+      "type": "string",
+      "required": true
+    },
+    "isRequired": {
+      "type": "boolean",
+      "required": true,
+      "default": false
     },
     "type": {
       "type": "enumeration",

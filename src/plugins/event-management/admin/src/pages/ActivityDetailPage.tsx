@@ -48,7 +48,7 @@ function getActivityStatus(start: string, end?: string): ActivityStatus {
 
 const STATUS_STYLES: Record<ActivityStatus, React.CSSProperties> = {
   Upcoming: { background: "#d9e8ff", color: "#0c4a6e" },
-  Ongoing: { background: "#c6f0c2", color: "#27772d" },
+  Ongoing: { background: "#f0d7c2", color: "#775827" },
   Completed: { background: "#eaeaef", color: "#666687" },
 };
 
@@ -184,7 +184,10 @@ export function ActivityDetailPage() {
             activityId={activityId}
             pendingCount={stats?.pending ?? 0}
             availableSlots={stats?.availableSlots ?? null}
-            onPromoted={() => { fetchStats(); setReloadKey((k) => k + 1); }}
+            onPromoted={() => {
+              fetchStats();
+              setReloadKey((k) => k + 1);
+            }}
           />
         </Box>
         <Box
@@ -197,7 +200,10 @@ export function ActivityDetailPage() {
             activityId={activityId}
             activeCount={stats?.active ?? 0}
             unsentActive={stats?.unsentActive ?? 0}
-            onSent={() => { fetchStats(); setReloadKey((k) => k + 1); }}
+            onSent={() => {
+              fetchStats();
+              setReloadKey((k) => k + 1);
+            }}
           />
         </Box>
       </Flex>
