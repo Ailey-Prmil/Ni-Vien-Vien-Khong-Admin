@@ -37,6 +37,28 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     return published?.id ?? id;
   },
 
+  /**
+   * Returns ALL numeric row IDs (draft + published, every locale) that belong
+   * to the same document as the given row ID. Using $in across all of these
+   * ensures we find registrations regardless of which row they were linked to.
+   */
+  async getAllRowIds(id: number): Promise<number[]> {
+    const row = (await strapi.db.query(ACTIVITY_UID).findOne({
+      where: { id },
+      select: ['id', 'documentId'],
+    })) as any;
+
+    if (!row?.documentId) return [id];
+
+    const rows = (await strapi.db.query(ACTIVITY_UID).findMany({
+      where: { documentId: row.documentId },
+      select: ['id'],
+    })) as any[];
+
+    const ids = rows.map((r: any) => r.id as number);
+    return ids.length > 0 ? ids : [id];
+  },
+
   async listActivities({
     search,
     sortBy,

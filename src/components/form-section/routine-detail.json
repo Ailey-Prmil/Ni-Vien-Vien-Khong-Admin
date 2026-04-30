@@ -7,16 +7,19 @@
   "attributes": {
     "dietaryRequirements": {
       "type": "enumeration",
+      "required": true,
       "enum": [
         "Ăn chay (Vegan)",
         "Ăn thường (Regular)"
       ]
     },
     "medicalCondition": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "foodAllergies": {
-      "type": "text"
+      "type": "text",
+      "required": true
     }
   },
   "config": {}
