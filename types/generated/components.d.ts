@@ -84,6 +84,7 @@ export interface FormComponentFormComponent extends Struct.ComponentSchema {
     icon: 'connector';
   };
   attributes: {
+    attributeName: Schema.Attribute.String & Schema.Attribute.Required;
     isRequired: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<false>;
@@ -260,9 +261,10 @@ export interface FormSectionRoutineDetail extends Struct.ComponentSchema {
   attributes: {
     dietaryRequirements: Schema.Attribute.Enumeration<
       ['\u0102n chay (Vegan)', '\u0102n th\u01B0\u1EDDng (Regular)']
-    >;
-    foodAllergies: Schema.Attribute.Text;
-    medicalCondition: Schema.Attribute.String;
+    > &
+      Schema.Attribute.Required;
+    foodAllergies: Schema.Attribute.Text & Schema.Attribute.Required;
+    medicalCondition: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 

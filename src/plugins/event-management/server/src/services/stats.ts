@@ -1,32 +1,44 @@
-import type { Core } from '@strapi/strapi';
+import type { Core } from "@strapi/strapi";
 
-const ACTIVITY_UID = 'api::activity.activity' as const;
-const REGISTRATION_UID = 'api::activity-registration.activity-registration' as const;
+const ACTIVITY_UID = "api::activity.activity" as const;
+const REGISTRATION_UID =
+  "api::activity-registration.activity-registration" as const;
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   async getStats(activityId: number) {
+    const activityIds = await strapi
+      .plugin("event-management")
+      .service("activities")
+      .getAllRowIds(activityId);
+
     const [activity, all] = await Promise.all([
       strapi.db.query(ACTIVITY_UID).findOne({
         where: { id: activityId },
-        select: ['registrationLimit'],
+        select: ["registrationLimit"],
       }),
       strapi.db.query(REGISTRATION_UID).findMany({
-        where: { registeredActivity: { id: activityId } },
-        select: ['registrationStatus', 'confirmed', 'confirmationEmailSentAt'],
+        where: { registeredActivity: { id: { $in: activityIds } } },
+        select: ["registrationStatus", "confirmed", "confirmationEmailSentAt"],
         populate: { registreeData: true },
       }),
     ]);
 
     const total = (all as any[]).length;
-    const active = (all as any[]).filter((r) => r.registrationStatus === 'active').length;
-    const pending = (all as any[]).filter((r) => r.registrationStatus === 'pending').length;
-    const canceled = (all as any[]).filter((r) => r.registrationStatus === 'canceled').length;
+    const active = (all as any[]).filter(
+      (r) => r.registrationStatus === "active",
+    ).length;
+    const pending = (all as any[]).filter(
+      (r) => r.registrationStatus === "pending",
+    ).length;
+    const canceled = (all as any[]).filter(
+      (r) => r.registrationStatus === "canceled",
+    ).length;
     const confirmedActive = (all as any[]).filter(
-      (r) => r.registrationStatus === 'active' && r.confirmed === true,
+      (r) => r.registrationStatus === "active" && r.confirmed === true,
     ).length;
     const unconfirmedActive = active - confirmedActive;
     const unsentActive = (all as any[]).filter(
-      (r) => r.registrationStatus === 'active' && !r.confirmationEmailSentAt,
+      (r) => r.registrationStatus === "active" && !r.confirmationEmailSentAt,
     ).length;
 
     const registrationLimit = (activity as any)?.registrationLimit ?? 0;
@@ -35,15 +47,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     // Youngest / oldest active registree by date-of-birth
     const activeDobs = (all as any[])
-      .filter((r) => r.registrationStatus === 'active' && r.registreeData?.dob)
+      .filter((r) => r.registrationStatus === "active" && r.registreeData?.dob)
       .map((r) => r.registreeData.dob as string);
 
-    const oldestActiveDob = activeDobs.length > 0
-      ? activeDobs.reduce((min, d) => (d < min ? d : min))
-      : null;
-    const youngestActiveDob = activeDobs.length > 0
-      ? activeDobs.reduce((max, d) => (d > max ? d : max))
-      : null;
+    const oldestActiveDob =
+      activeDobs.length > 0
+        ? activeDobs.reduce((min, d) => (d < min ? d : min))
+        : null;
+    const youngestActiveDob =
+      activeDobs.length > 0
+        ? activeDobs.reduce((max, d) => (d > max ? d : max))
+        : null;
 
     return {
       total,

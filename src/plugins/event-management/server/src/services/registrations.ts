@@ -50,8 +50,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       pageSize?: number;
     },
   ) {
+    const activityIds = await strapi.plugin('event-management').service('activities').getAllRowIds(activityId);
+
     const filters: Record<string, any> = {
-      registeredActivity: { id: activityId },
+      registeredActivity: { id: { $in: activityIds } },
     };
     if (status) filters.registrationStatus = { $eq: status };
     if (confirmed !== undefined) filters.confirmed = { $eq: confirmed };
@@ -73,8 +75,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   async getAllForActivity(activityId: number) {
+    const activityIds = await strapi.plugin('event-management').service('activities').getAllRowIds(activityId);
     return strapi.db.query(REGISTRATION_UID).findMany({
-      where: { registeredActivity: { id: activityId } },
+      where: { registeredActivity: { id: { $in: activityIds } } },
       orderBy: { createdAt: 'asc' },
       populate: { registreeData: true },
     });

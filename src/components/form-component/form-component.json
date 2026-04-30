@@ -17,6 +17,11 @@
         "Thông tin khác (Others)"
       ]
     },
+    "attributeName": {
+      "type": "string",
+      "required": true,
+      "regex": "^[^.,!@#$%\\^&*();\"':\\[\\]{}?/|<>]+$"
+    },
     "label": {
       "type": "string",
       "required": true
