@@ -122,6 +122,32 @@ export default {
           ],
         },
       },
+      {
+        method: "POST",
+        path: "/registrations/:registrationId/confirm",
+        handler: "event-management.confirmRegistration",
+        config: {
+          policies: [
+            {
+              name: "admin::hasPermissions",
+              config: { actions: ["plugin::event-management.manage-registrations"] },
+            },
+          ],
+        },
+      },
+      {
+        method: "POST",
+        path: "/registrations/:registrationId/cancel",
+        handler: "event-management.cancelRegistration",
+        config: {
+          policies: [
+            {
+              name: "admin::hasPermissions",
+              config: { actions: ["plugin::event-management.manage-registrations"] },
+            },
+          ],
+        },
+      },
     ],
   },
 };

@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowClockwise } from "@strapi/icons";
 import { useFetchClient, useNotification } from "@strapi/strapi/admin";
 import { PLUGIN_ID } from "../pluginId";
 import { PageLayout } from "../components/PageLayout";
-import { ActivityStats } from "../components/ActivityStats";
+import { ActivityStats, Stats } from "../components/ActivityStats";
 import { RegistrationTable } from "../components/RegistrationTable";
 import { SendConfirmationSection } from "../components/SendConfirmationSection";
 import { WaitlistPromotionSection } from "../components/WaitlistPromotionSection";
@@ -23,19 +23,19 @@ interface Activity {
   publishedAt?: string | null;
 }
 
-interface Stats {
-  total: number;
-  active: number;
-  pending: number;
-  canceled: number;
-  confirmedActive: number;
-  unconfirmedActive: number;
-  unsentActive: number;
-  registrationLimit: number;
-  availableSlots: number | null;
-  oldestActiveDob: string | null;
-  youngestActiveDob: string | null;
-}
+// interface Stats {
+//   total: number;
+//   active: number;
+//   pending: number;
+//   canceled: number;
+//   confirmedActive: number;
+//   unconfirmedActive: number;
+//   unsentActive: number;
+//   registrationLimit: number;
+//   availableSlots: number | null;
+//   oldestActiveDob: string | null;
+//   youngestActiveDob: string | null;
+// }
 
 type ActivityStatus = "Upcoming" | "Ongoing" | "Completed";
 
