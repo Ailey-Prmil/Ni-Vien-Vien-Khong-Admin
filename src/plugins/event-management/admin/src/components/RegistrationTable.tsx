@@ -16,12 +16,12 @@ import {
   Td,
   Th,
   Thead,
-  Tooltip,
+  TextInput,
   Tr,
   Typography,
 } from "@strapi/design-system";
 import { useFetchClient, useNotification, useRBAC } from "@strapi/strapi/admin";
-import { Download, Cog, ArrowUp } from "@strapi/icons";
+import { Download, Cog, ArrowUp, Check, Cross } from "@strapi/icons";
 import { PLUGIN_ID } from "../pluginId";
 
 // ── Column definitions ────────────────────────────────────────────────────────
@@ -29,22 +29,21 @@ import { PLUGIN_ID } from "../pluginId";
 /** Known field-name → display-label mappings (backend field names as keys). */
 const FIELD_LABELS: Record<string, string> = {
   id: "ID",
-  registrationStatus: "Status",
-  confirmed: "Confirmed",
-  confirmationEmailSentAt: "Email Sent",
-  firstTimeRegistered: "First Timer",
-  createdAt: "Registered At",
-  fullName: "Full Name",
-  dob: "DOB",
-  gender: "Gender",
+  registrationStatus: "Trạng thái",
+  confirmed: "Đã xác nhận",
+  confirmationEmailSentAt: "Thời gian gửi mail xác nhận",
+  firstTimeRegistered: "Lần đầu đăng ký",
+  createdAt: "Thời gian đăng ký",
+  fullName: "Họ và tên",
+  dob: "Sinh nhật",
+  gender: "Giới tính",
   email: "Email",
-  address: "Address",
-  phoneNumber: "Phone",
-  haveZalo: "Have Zalo",
-  zaloName: "Zalo Name",
+  address: "Địa chỉ",
+  phoneNumber: "Số điện thoại",
+  zaloName: "Tên hiển thị Zalo",
 };
 
-/** Returns the display label for a field, falling back to the raw field name. */
+/** Returns the display label for a field key, falling back to the raw key. */
 function fieldLabel(field: string): string {
   return FIELD_LABELS[field] ?? field;
 }
@@ -62,12 +61,18 @@ const PAGE_SIZE = 20;
 
 // ── Data types ────────────────────────────────────────────────────────────────
 
+interface FieldDescriptor {
+  key: string;
+  label: string;
+}
+
 interface Registration {
   id: number;
   registrationStatus: string;
   confirmed: boolean | null;
   firstTimeRegistered: boolean;
   createdAt: string;
+  confirmationEmailSentAt?: string;
   registreeData?: Record<string, any>;
   registrationPayload?: Record<string, Record<string, any>>;
 }
@@ -78,31 +83,6 @@ interface RegistrationTableProps {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-// function TruncatedCell({
-//   text,
-//   maxWidth = 200,
-// }: {
-//   text: string;
-//   maxWidth?: number;
-// }) {
-//   return (
-//     <Tooltip label={text}>
-//       <span
-//         style={{
-//           maxWidth,
-//           overflow: "hidden",
-//           textOverflow: "ellipsis",
-//           whiteSpace: "nowrap",
-//           display: "block",
-//           cursor: "default",
-//         }}
-//       >
-//         {text}
-//       </span>
-//     </Tooltip>
-//   );
-// }
 
 function statusColor(status: string) {
   if (status === "active") return "success600";
@@ -120,7 +100,7 @@ function confirmedLabel(val: boolean | null) {
 
 interface ColumnPickerModalProps {
   open: boolean;
-  availableFields: string[];
+  availableFields: FieldDescriptor[];
   visible: string[];
   onChange: (cols: string[]) => void;
   onClose: () => void;
@@ -139,9 +119,9 @@ function ColumnPickerModal({
     if (open) setLocal(visible);
   }, [open]);
 
-  function toggle(col: string) {
+  function toggle(key: string) {
     setLocal((prev) =>
-      prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col],
+      prev.includes(key) ? prev.filter((c) => c !== key) : [...prev, key],
     );
   }
 
@@ -155,17 +135,17 @@ function ColumnPickerModal({
         </Modal.Header>
         <Modal.Body>
           <Flex wrap="wrap" gap={3}>
-            {availableFields.map((col) => {
-              const checked = local.includes(col);
+            {availableFields.map((field) => {
+              const checked = local.includes(field.key);
               const disabled = !checked && local.length >= MAX_COLUMNS;
               return (
-                <Box key={col} style={{ minWidth: 160 }}>
+                <Box key={field.key} style={{ minWidth: 160 }}>
                   <Checkbox
                     checked={checked}
                     disabled={disabled}
-                    onCheckedChange={() => !disabled && toggle(col)}
+                    onCheckedChange={() => !disabled && toggle(field.key)}
                   >
-                    {fieldLabel(col)}
+                    {field.label}
                   </Checkbox>
                 </Box>
               );
@@ -207,9 +187,9 @@ function ColumnPickerModal({
 
 interface FieldPickerModalProps {
   open: boolean;
-  availableFields: string[];
+  availableFields: FieldDescriptor[];
   selectedFields: string[];
-  onToggle: (field: string) => void;
+  onToggle: (key: string) => void;
   onSelectAll: () => void;
   onClearAll: () => void;
   onConfirm: () => void;
@@ -243,12 +223,12 @@ function FieldPickerModal({
           </Flex>
           <Flex wrap="wrap" gap={3}>
             {availableFields.map((field) => (
-              <Box key={field} style={{ minWidth: 200 }}>
+              <Box key={field.key} style={{ minWidth: 200 }}>
                 <Checkbox
-                  checked={selectedFields.includes(field)}
-                  onCheckedChange={() => onToggle(field)}
+                  checked={selectedFields.includes(field.key)}
+                  onCheckedChange={() => onToggle(field.key)}
                 >
-                  {field}
+                  {field.label}
                 </Checkbox>
               </Box>
             ))}
@@ -269,14 +249,88 @@ function FieldPickerModal({
   );
 }
 
+// ── Action confirmation modal ─────────────────────────────────────────────────
+
+type ActionType = "promote" | "confirm" | "cancel";
+
+const ACTION_CONFIG: Record<
+  ActionType,
+  { title: string; body: (name: string) => string; confirmLabel: string; confirmVariant: string }
+> = {
+  promote: {
+    title: "Promote registration",
+    body: (name) => `Promote ${name ? `"${name}" ` : "this registration "}from the waitlist to active?`,
+    confirmLabel: "Promote",
+    confirmVariant: "secondary",
+  },
+  confirm: {
+    title: "Confirm registration",
+    body: (name) => `Manually confirm ${name ? `"${name}"` : "this registration"} on behalf of the registrant?`,
+    confirmLabel: "Confirm",
+    confirmVariant: "secondary",
+  },
+  cancel: {
+    title: "Cancel registration",
+    body: (name) => `Cancel ${name ? `"${name}"` : "this registration"}? This cannot be undone.`,
+    confirmLabel: "Cancel registration",
+    confirmVariant: "danger",
+  },
+};
+
+interface PendingAction {
+  type: ActionType;
+  registrationId: number;
+  name: string;
+}
+
+interface ConfirmActionModalProps {
+  pending: PendingAction | null;
+  loading: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+}
+
+function ConfirmActionModal({ pending, loading, onConfirm, onClose }: ConfirmActionModalProps) {
+  if (!pending) return null;
+  const cfg = ACTION_CONFIG[pending.type];
+  return (
+    <Modal.Root open onOpenChange={(v: boolean) => !v && onClose()}>
+      <Modal.Content>
+        <Modal.Header>
+          <Typography variant="beta">{cfg.title}</Typography>
+        </Modal.Header>
+        <Modal.Body>
+          <Typography>{cfg.body(pending.name)}</Typography>
+        </Modal.Body>
+        <Modal.Footer>
+          <Flex gap={3} justifyContent="flex-end">
+            <Button variant="ghost" onClick={onClose} disabled={loading}>
+              Go back
+            </Button>
+            <Button variant={cfg.confirmVariant as any} onClick={onConfirm} loading={loading}>
+              {cfg.confirmLabel}
+            </Button>
+          </Flex>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal.Root>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function RegistrationTable({ activityId, reloadKey }: RegistrationTableProps) {
+export function RegistrationTable({
+  activityId,
+  reloadKey,
+}: RegistrationTableProps) {
   const { get, post } = useFetchClient();
   const { toggleNotification } = useNotification();
   const { allowedActions } = useRBAC({
     canExport: [{ action: "plugin::event-management.export" }],
     canManageWaitlist: [{ action: "plugin::event-management.manage-waitlist" }],
+    canManageRegistrations: [
+      { action: "plugin::event-management.manage-registrations" },
+    ],
   });
 
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -288,6 +342,8 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
   // Filters & sort
   const [statusFilter, setStatusFilter] = useState("");
   const [confirmedFilter, setConfirmedFilter] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("registeredAt");
   const [sortOrder, setSortOrder] = useState("asc");
 
@@ -298,31 +354,93 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
   const [colPickerOpen, setColPickerOpen] = useState(false);
 
   // Shared available-fields state (used by both column picker and export)
-  const [availableFields, setAvailableFields] = useState<string[]>([]);
+  const [availableFields, setAvailableFields] = useState<FieldDescriptor[]>([]);
   const [loadingFields, setLoadingFields] = useState(false);
 
   // Export field picker
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
 
-  // Per-row promoting state
+  // Per-row action state
   const [promotingId, setPromotingId] = useState<number | null>(null);
+  const [confirmingId, setConfirmingId] = useState<number | null>(null);
+  const [cancelingId, setCancelingId] = useState<number | null>(null);
+
+  // Pending action awaiting admin confirmation in dialog
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+
+  // Debounce search input → committed search value
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
 
   const handlePromoteRow = async (registrationId: number) => {
     setPromotingId(registrationId);
     try {
       await post(`/${PLUGIN_ID}/registrations/${registrationId}/promote`, {});
-      toggleNotification({ type: "success", message: "Registration promoted to active." });
+      toggleNotification({
+        type: "success",
+        message: "Registration promoted to active.",
+      });
       fetchRegistrations();
     } catch (err: any) {
       const msg = err?.response?.data?.error?.message ?? err?.message ?? "";
       if (msg.includes("No available slots")) {
-        toggleNotification({ type: "danger", message: "No available slots — increase the registration limit first." });
+        toggleNotification({
+          type: "danger",
+          message:
+            "No available slots — increase the registration limit first.",
+        });
       } else {
-        toggleNotification({ type: "danger", message: "Failed to promote registration." });
+        toggleNotification({
+          type: "danger",
+          message: "Failed to promote registration.",
+        });
       }
     } finally {
       setPromotingId(null);
+    }
+  };
+
+  const handleConfirmRow = async (registrationId: number) => {
+    setConfirmingId(registrationId);
+    try {
+      await post(`/${PLUGIN_ID}/registrations/${registrationId}/confirm`, {});
+      toggleNotification({
+        type: "success",
+        message: "Registration confirmed.",
+      });
+      fetchRegistrations();
+    } catch {
+      toggleNotification({
+        type: "danger",
+        message: "Failed to confirm registration.",
+      });
+    } finally {
+      setConfirmingId(null);
+    }
+  };
+
+  const handleCancelRow = async (registrationId: number) => {
+    setCancelingId(registrationId);
+    try {
+      await post(`/${PLUGIN_ID}/registrations/${registrationId}/cancel`, {});
+      toggleNotification({
+        type: "success",
+        message: "Registration canceled.",
+      });
+      fetchRegistrations();
+    } catch {
+      toggleNotification({
+        type: "danger",
+        message: "Failed to cancel registration.",
+      });
+    } finally {
+      setCancelingId(null);
     }
   };
 
@@ -338,6 +456,7 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
       if (statusFilter) params.status = statusFilter;
       if (statusFilter === "active" && confirmedFilter !== "")
         params.confirmed = confirmedFilter;
+      if (search) params.search = search;
 
       const res = await get(
         `/${PLUGIN_ID}/activities/${activityId}/registrations`,
@@ -355,21 +474,30 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
     } finally {
       setLoading(false);
     }
-  }, [activityId, statusFilter, confirmedFilter, sortBy, sortOrder, page, reloadKey]);
+  }, [
+    activityId,
+    statusFilter,
+    confirmedFilter,
+    search,
+    sortBy,
+    sortOrder,
+    page,
+    reloadKey,
+  ]);
 
   useEffect(() => {
     fetchRegistrations();
   }, [fetchRegistrations]);
 
   /** Fetches available fields from the backend (once) and caches in state. */
-  async function ensureAvailableFields(): Promise<string[] | null> {
+  async function ensureAvailableFields(): Promise<FieldDescriptor[] | null> {
     if (availableFields.length > 0) return availableFields;
     setLoadingFields(true);
     try {
       const res = await get(
         `/${PLUGIN_ID}/activities/${activityId}/available-fields`,
       );
-      const fields: string[] = (res as any).data?.data ?? [];
+      const fields: FieldDescriptor[] = (res as any).data?.data ?? [];
       setAvailableFields(fields);
       return fields;
     } catch {
@@ -398,7 +526,7 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
   const handleOpenExport = async () => {
     const fields = await ensureAvailableFields();
     if (fields) {
-      setSelectedFields(fields);
+      setSelectedFields(fields.map((f) => f.key));
       setPickerOpen(true);
     }
   };
@@ -412,7 +540,7 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
         { params: { fields: selectedFields.join(",") } },
       );
       const csv: string = (res as any).data?.data ?? "";
-      const blob = new Blob(["\uFEFF" + csv], {
+      const blob = new Blob([csv], {
         type: "text/csv;charset=utf-8;",
       });
       const blobUrl = URL.createObjectURL(blob);
@@ -446,7 +574,11 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
         return (
           <Typography textColor={sentAt ? "success600" : "neutral500"}>
             {sentAt
-              ? new Date(sentAt).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" })
+              ? new Date(sentAt).toLocaleDateString("vi-VN", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
               : "—"}
           </Typography>
         );
@@ -466,27 +598,29 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
     // registreeData fields
     if (reg.registreeData && field in reg.registreeData) {
       const val = reg.registreeData[field];
-      // if (field === "fullName" || field === "email") {
-      //   return <TruncatedCell text={val ?? "—"} />;
-      // }
       if (typeof val === "boolean") {
         return <Typography>{val ? "Yes" : "No"}</Typography>;
       }
       return <Typography>{val ?? "—"}</Typography>;
     }
 
-    // registrationPayload fields — search through each section's keys
-    if (reg.registrationPayload) {
-      for (const section of Object.values(reg.registrationPayload)) {
-        if (section && typeof section === "object" && field in section) {
-          const val = section[field];
-          return <Typography>{val != null ? String(val) : "—"}</Typography>;
-        }
+    // registrationPayload fields — key format is sectionKey__fieldKey
+    if (field.includes("__") && reg.registrationPayload) {
+      const sep = field.indexOf("__");
+      const sectionKey = field.slice(0, sep);
+      const fieldKey = field.slice(sep + 2);
+      const section = reg.registrationPayload[sectionKey];
+      if (section && fieldKey in section) {
+        const val = section[fieldKey];
+        return <Typography>{val != null ? String(val) : "—"}</Typography>;
       }
     }
 
     return <Typography>—</Typography>;
   }
+
+  const anyActionInProgress =
+    promotingId !== null || confirmingId !== null || cancelingId !== null;
 
   return (
     <Box background="neutral100" padding={5} borderRadius="4px">
@@ -524,8 +658,17 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
         </Flex>
       </Flex>
 
-      {/* ── Filters ── */}
+      {/* ── Search + Filters ── */}
       <Flex gap={3} marginBottom={4} wrap="wrap">
+        <TextInput
+          placeholder="Search name, phone, email…"
+          value={searchInput}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchInput(e.target.value)
+          }
+          style={{ minWidth: 220 }}
+        />
+
         <SingleSelect value={statusFilter} onChange={handleStatusChange}>
           <SingleSelectOption value="">All statuses</SingleSelectOption>
           <SingleSelectOption value="active">Active</SingleSelectOption>
@@ -584,7 +727,10 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
           <Typography>No registrations found.</Typography>
         </Box>
       ) : (
-        <Table colCount={visibleColumns.length + 1} rowCount={registrations.length}>
+        <Table
+          colCount={visibleColumns.length + 1}
+          rowCount={registrations.length}
+        >
           <Thead>
             <Tr>
               {visibleColumns.map((col) => (
@@ -604,18 +750,48 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
                   <Td key={col}>{renderCell(reg, col)}</Td>
                 ))}
                 <Td>
-                  {allowedActions.canManageWaitlist && reg.registrationStatus === "pending" && (
-                    <Button
-                      size="S"
-                      variant="secondary"
-                      startIcon={<ArrowUp />}
-                      loading={promotingId === reg.id}
-                      disabled={promotingId !== null}
-                      onClick={() => handlePromoteRow(reg.id)}
-                    >
-                      Promote
-                    </Button>
-                  )}
+                  <Flex gap={1}>
+                    {allowedActions.canManageWaitlist &&
+                      reg.registrationStatus === "pending" && (
+                        <Button
+                          size="S"
+                          variant="secondary"
+                          startIcon={<ArrowUp />}
+                          loading={promotingId === reg.id}
+                          disabled={anyActionInProgress}
+                          onClick={() => setPendingAction({ type: "promote", registrationId: reg.id, name: reg.registreeData?.fullName ?? "" })}
+                        >
+                          Promote
+                        </Button>
+                      )}
+                    {allowedActions.canManageRegistrations &&
+                      reg.registrationStatus === "active" &&
+                      reg.confirmed !== true && (
+                        <Button
+                          size="S"
+                          variant="secondary"
+                          startIcon={<Check />}
+                          loading={confirmingId === reg.id}
+                          disabled={anyActionInProgress}
+                          onClick={() => setPendingAction({ type: "confirm", registrationId: reg.id, name: reg.registreeData?.fullName ?? "" })}
+                        >
+                          Confirm
+                        </Button>
+                      )}
+                    {allowedActions.canManageRegistrations &&
+                      reg.registrationStatus !== "canceled" && (
+                        <Button
+                          size="S"
+                          variant="danger-light"
+                          startIcon={<Cross />}
+                          loading={cancelingId === reg.id}
+                          disabled={anyActionInProgress}
+                          onClick={() => setPendingAction({ type: "cancel", registrationId: reg.id, name: reg.registreeData?.fullName ?? "" })}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                  </Flex>
                 </Td>
               </Tr>
             ))}
@@ -653,17 +829,36 @@ export function RegistrationTable({ activityId, reloadKey }: RegistrationTablePr
         onClose={() => setColPickerOpen(false)}
       />
 
+      {/* ── Action confirmation modal ── */}
+      <ConfirmActionModal
+        pending={pendingAction}
+        loading={
+          (pendingAction?.type === "promote" && promotingId === pendingAction.registrationId) ||
+          (pendingAction?.type === "confirm" && confirmingId === pendingAction.registrationId) ||
+          (pendingAction?.type === "cancel" && cancelingId === pendingAction.registrationId)
+        }
+        onConfirm={async () => {
+          if (!pendingAction) return;
+          const { type, registrationId } = pendingAction;
+          if (type === "promote") await handlePromoteRow(registrationId);
+          else if (type === "confirm") await handleConfirmRow(registrationId);
+          else if (type === "cancel") await handleCancelRow(registrationId);
+          setPendingAction(null);
+        }}
+        onClose={() => setPendingAction(null)}
+      />
+
       {/* ── Export field picker modal ── */}
       <FieldPickerModal
         open={pickerOpen}
         availableFields={availableFields}
         selectedFields={selectedFields}
-        onToggle={(f) =>
+        onToggle={(key) =>
           setSelectedFields((prev) =>
-            prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f],
+            prev.includes(key) ? prev.filter((x) => x !== key) : [...prev, key],
           )
         }
-        onSelectAll={() => setSelectedFields([...availableFields])}
+        onSelectAll={() => setSelectedFields(availableFields.map((f) => f.key))}
         onClearAll={() => setSelectedFields([])}
         onConfirm={handleExportConfirm}
         onClose={() => setPickerOpen(false)}

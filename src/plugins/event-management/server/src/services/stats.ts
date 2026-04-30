@@ -11,11 +11,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       .service("activities")
       .getAllRowIds(activityId);
 
+    const activityRow = await strapi.db.query(ACTIVITY_UID).findOne({
+      where: { id: activityId },
+      select: ['documentId'],
+    }) as any;
+
     const [activity, all] = await Promise.all([
-      strapi.db.query(ACTIVITY_UID).findOne({
-        where: { id: activityId },
-        select: ["registrationLimit"],
-      }),
+      activityRow?.documentId
+        ? strapi.documents(ACTIVITY_UID).findOne({
+            documentId: activityRow.documentId,
+            status: 'published',
+            fields: ['registrationLimit'],
+          })
+        : Promise.resolve(null),
       strapi.db.query(REGISTRATION_UID).findMany({
         where: { registeredActivity: { id: { $in: activityIds } } },
         select: ["registrationStatus", "confirmed", "confirmationEmailSentAt"],
@@ -43,7 +51,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const registrationLimit = (activity as any)?.registrationLimit ?? 0;
     const availableSlots =
-      registrationLimit === 0 ? null : Math.max(0, registrationLimit - active);
+      registrationLimit > 0 ? Math.max(0, registrationLimit - active) : null;
 
     // Youngest / oldest active registree by date-of-birth
     const activeDobs = (all as any[])
