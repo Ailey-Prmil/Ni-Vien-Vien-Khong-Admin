@@ -33,6 +33,13 @@ export default {
         pluginName: "event-management",
         subCategory: "Operations",
       },
+      {
+        section: "plugins",
+        displayName: "Confirm & Cancel Registrations",
+        uid: "manage-registrations",
+        pluginName: "event-management",
+        subCategory: "Operations",
+      },
     ]);
   },
   controllers,

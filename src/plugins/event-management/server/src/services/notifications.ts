@@ -36,6 +36,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     let skipped = 0;
 
     for (const reg of registrations as any[]) {
+      // skip registrations already confirmed (by link click or by admin)
+      if (reg.confirmed) {
+        skipped++;
+        continue;
+      }
+
       // resend=false: skip already-sent (only send to unsent)
       // resend=true: skip NOT-yet-sent (only re-send to already-sent)
       if (!resend && reg.confirmationEmailSentAt) {

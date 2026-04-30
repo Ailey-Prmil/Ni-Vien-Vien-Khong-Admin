@@ -87,15 +87,24 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         ? { [sortBy]: sortOrder || 'asc' }
         : { activityStartDate: 'asc' };
 
-    return strapi.entityService.findMany(ACTIVITY_UID, {
+    return strapi.documents(ACTIVITY_UID).findMany({
       filters,
       sort,
+      status: 'published',
       populate: { coverImage: { fields: ['url', 'name'] } },
     });
   },
 
   async getActivity(id: number) {
-    return strapi.entityService.findOne(ACTIVITY_UID, id, {
+    const row = await strapi.db.query(ACTIVITY_UID).findOne({
+      where: { id },
+      select: ['documentId'],
+    }) as any;
+    if (!row?.documentId) return null;
+
+    return strapi.documents(ACTIVITY_UID).findOne({
+      documentId: row.documentId,
+      status: 'published',
       populate: {
         coverImage: { fields: ['url', 'name'] },
         registrationForm: true,
