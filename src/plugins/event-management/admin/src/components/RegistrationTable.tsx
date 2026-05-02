@@ -49,12 +49,12 @@ function fieldLabel(field: string): string {
 }
 
 const DEFAULT_VISIBLE_FIELDS: string[] = [
-  "id",
   "fullName",
   "registrationStatus",
   "confirmed",
   "confirmationEmailSentAt",
-  "createdAt",
+  "phoneNumber",
+  "zaloName",
 ];
 const MAX_COLUMNS = 10;
 const PAGE_SIZE = 20;
@@ -255,23 +255,31 @@ type ActionType = "promote" | "confirm" | "cancel";
 
 const ACTION_CONFIG: Record<
   ActionType,
-  { title: string; body: (name: string) => string; confirmLabel: string; confirmVariant: string }
+  {
+    title: string;
+    body: (name: string) => string;
+    confirmLabel: string;
+    confirmVariant: string;
+  }
 > = {
   promote: {
     title: "Promote registration",
-    body: (name) => `Promote ${name ? `"${name}" ` : "this registration "}from the waitlist to active?`,
+    body: (name) =>
+      `Promote ${name ? `"${name}" ` : "this registration "}from the waitlist to active?`,
     confirmLabel: "Promote",
     confirmVariant: "secondary",
   },
   confirm: {
     title: "Confirm registration",
-    body: (name) => `Manually confirm ${name ? `"${name}"` : "this registration"} on behalf of the registrant?`,
+    body: (name) =>
+      `Manually confirm ${name ? `"${name}"` : "this registration"} on behalf of the registrant?`,
     confirmLabel: "Confirm",
     confirmVariant: "secondary",
   },
   cancel: {
     title: "Cancel registration",
-    body: (name) => `Cancel ${name ? `"${name}"` : "this registration"}? This cannot be undone.`,
+    body: (name) =>
+      `Cancel ${name ? `"${name}"` : "this registration"}? This cannot be undone.`,
     confirmLabel: "Cancel registration",
     confirmVariant: "danger",
   },
@@ -290,7 +298,12 @@ interface ConfirmActionModalProps {
   onClose: () => void;
 }
 
-function ConfirmActionModal({ pending, loading, onConfirm, onClose }: ConfirmActionModalProps) {
+function ConfirmActionModal({
+  pending,
+  loading,
+  onConfirm,
+  onClose,
+}: ConfirmActionModalProps) {
   if (!pending) return null;
   const cfg = ACTION_CONFIG[pending.type];
   return (
@@ -307,7 +320,11 @@ function ConfirmActionModal({ pending, loading, onConfirm, onClose }: ConfirmAct
             <Button variant="ghost" onClick={onClose} disabled={loading}>
               Go back
             </Button>
-            <Button variant={cfg.confirmVariant as any} onClick={onConfirm} loading={loading}>
+            <Button
+              variant={cfg.confirmVariant as any}
+              onClick={onConfirm}
+              loading={loading}
+            >
               {cfg.confirmLabel}
             </Button>
           </Flex>
@@ -367,7 +384,9 @@ export function RegistrationTable({
   const [cancelingId, setCancelingId] = useState<number | null>(null);
 
   // Pending action awaiting admin confirmation in dialog
-  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(
+    null,
+  );
 
   // Debounce search input → committed search value
   useEffect(() => {
@@ -759,7 +778,13 @@ export function RegistrationTable({
                           startIcon={<ArrowUp />}
                           loading={promotingId === reg.id}
                           disabled={anyActionInProgress}
-                          onClick={() => setPendingAction({ type: "promote", registrationId: reg.id, name: reg.registreeData?.fullName ?? "" })}
+                          onClick={() =>
+                            setPendingAction({
+                              type: "promote",
+                              registrationId: reg.id,
+                              name: reg.registreeData?.fullName ?? "",
+                            })
+                          }
                         >
                           Promote
                         </Button>
@@ -773,7 +798,13 @@ export function RegistrationTable({
                           startIcon={<Check />}
                           loading={confirmingId === reg.id}
                           disabled={anyActionInProgress}
-                          onClick={() => setPendingAction({ type: "confirm", registrationId: reg.id, name: reg.registreeData?.fullName ?? "" })}
+                          onClick={() =>
+                            setPendingAction({
+                              type: "confirm",
+                              registrationId: reg.id,
+                              name: reg.registreeData?.fullName ?? "",
+                            })
+                          }
                         >
                           Confirm
                         </Button>
@@ -786,7 +817,13 @@ export function RegistrationTable({
                           startIcon={<Cross />}
                           loading={cancelingId === reg.id}
                           disabled={anyActionInProgress}
-                          onClick={() => setPendingAction({ type: "cancel", registrationId: reg.id, name: reg.registreeData?.fullName ?? "" })}
+                          onClick={() =>
+                            setPendingAction({
+                              type: "cancel",
+                              registrationId: reg.id,
+                              name: reg.registreeData?.fullName ?? "",
+                            })
+                          }
                         >
                           Cancel
                         </Button>
@@ -833,9 +870,12 @@ export function RegistrationTable({
       <ConfirmActionModal
         pending={pendingAction}
         loading={
-          (pendingAction?.type === "promote" && promotingId === pendingAction.registrationId) ||
-          (pendingAction?.type === "confirm" && confirmingId === pendingAction.registrationId) ||
-          (pendingAction?.type === "cancel" && cancelingId === pendingAction.registrationId)
+          (pendingAction?.type === "promote" &&
+            promotingId === pendingAction.registrationId) ||
+          (pendingAction?.type === "confirm" &&
+            confirmingId === pendingAction.registrationId) ||
+          (pendingAction?.type === "cancel" &&
+            cancelingId === pendingAction.registrationId)
         }
         onConfirm={async () => {
           if (!pendingAction) return;

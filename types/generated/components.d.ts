@@ -84,7 +84,7 @@ export interface FormComponentFormComponent extends Struct.ComponentSchema {
     icon: 'connector';
   };
   attributes: {
-    attributeName: Schema.Attribute.String & Schema.Attribute.Required;
+    attributeName: Schema.Attribute.String;
     isRequired: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<false>;
