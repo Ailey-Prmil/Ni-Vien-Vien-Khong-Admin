@@ -19,7 +19,7 @@
     },
     "attributeName": {
       "type": "string",
-      "required": true,
+      "required": false,
       "regex": "^[^.,!@#$%\\^&*();\"':\\[\\]{}?/|<>]+$"
     },
     "label": {
