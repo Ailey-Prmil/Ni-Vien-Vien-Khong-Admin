@@ -196,6 +196,15 @@
       },
       "mappedBy": "registeredActivity"
     },
+    "formOpened": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": true
+    },
     "registrationForm": {
       "type": "component",
       "pluginOptions": {
