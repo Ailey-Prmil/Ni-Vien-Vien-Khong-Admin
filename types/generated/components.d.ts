@@ -190,6 +190,8 @@ export interface FormSectionBasicInformation extends Struct.ComponentSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<true>;
     phoneNumber: Schema.Attribute.String & Schema.Attribute.Required;
+    province: Schema.Attribute.String & Schema.Attribute.Required;
+    ward: Schema.Attribute.String & Schema.Attribute.Required;
     zaloName: Schema.Attribute.String;
   };
 }
