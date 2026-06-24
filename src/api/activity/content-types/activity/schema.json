@@ -94,6 +94,15 @@
       },
       "default": false
     },
+    "pendingListIncluded": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": false
+    },
     "minAge": {
       "type": "integer",
       "pluginOptions": {

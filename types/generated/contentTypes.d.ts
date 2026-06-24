@@ -475,7 +475,8 @@ export interface ApiActivityRegistrationActivityRegistration
         i18n: {
           localized: false;
         };
-      }>;
+      }> &
+      Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -633,6 +634,13 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
           localized: false;
         };
       }>;
+    pendingListIncluded: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     registrationForm: Schema.Attribute.Component<
       'form-component.form-template',

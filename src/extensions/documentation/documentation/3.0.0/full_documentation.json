@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-05-03T14:34:39.518Z"
+    "x-generation-date": "2026-06-24T17:20:09.948Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -8359,6 +8359,9 @@
               "ageRestricted": {
                 "type": "boolean"
               },
+              "pendingListIncluded": {
+                "type": "boolean"
+              },
               "minAge": {
                 "type": "integer"
               },
@@ -9334,6 +9337,9 @@
           "ageRestricted": {
             "type": "boolean"
           },
+          "pendingListIncluded": {
+            "type": "boolean"
+          },
           "minAge": {
             "type": "integer"
           },
@@ -9564,6 +9570,9 @@
                   "type": "integer"
                 },
                 "ageRestricted": {
+                  "type": "boolean"
+                },
+                "pendingListIncluded": {
                   "type": "boolean"
                 },
                 "minAge": {
@@ -10571,6 +10580,12 @@
             "format": "email"
           },
           "address": {
+            "type": "string"
+          },
+          "ward": {
+            "type": "string"
+          },
+          "province": {
             "type": "string"
           },
           "phoneNumber": {
