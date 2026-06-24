@@ -29,6 +29,14 @@
       "type": "text",
       "required": true
     },
+    "ward": {
+      "type": "string",
+      "required": true
+    },
+    "province": {
+      "type": "string",
+      "required": true
+    },
     "phoneNumber": {
       "type": "string",
       "required": true,
