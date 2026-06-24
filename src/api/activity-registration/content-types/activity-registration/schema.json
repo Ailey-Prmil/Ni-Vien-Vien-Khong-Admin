@@ -39,7 +39,8 @@
         "i18n": {
           "localized": false
         }
-      }
+      },
+      "default": true
     },
     "registrationStatus": {
       "type": "enumeration",
