@@ -20,6 +20,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           "zaloGroup",
           "activityStartDate",
           "activityEndDate",
+          "slug",
+          "documentId",
         ],
       }),
       strapi.db.query(REGISTRATION_UID).findMany({
@@ -33,7 +35,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const activityName = (activity as any)?.activityName ?? "";
     const zaloGroup = (activity as any)?.zaloGroup ?? "";
-    const backendUrl = process.env.STRAPI_ADMIN_URL || "http://localhost:1337";
+    const slug = (activity as any)?.slug ?? "";
+    const documentId = (activity as any)?.documentId ?? "";
+    const frontendUrl =
+      process.env.FRONTEND_URL || "https://www.vienkhongni.com";
     const expiresAt = new Date(Date.now() + THREE_DAYS_MS);
 
     const formatDateTime = (value: unknown): string =>
@@ -94,7 +99,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           },
         });
 
-        const confirmationLink = `${backendUrl}/api/activity-registrations/confirm?code=${newToken}`;
+        const confirmationLink = `${frontendUrl}/activity/${slug}-${documentId}/confirm?code=${newToken}`;
         const expiryDateStr = expiresAt.toLocaleDateString("vi-VN", {
           day: "2-digit",
           month: "2-digit",
