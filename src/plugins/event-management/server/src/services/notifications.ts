@@ -22,6 +22,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           "activityEndDate",
           "slug",
           "documentId",
+          "confirmExpiredDate",
         ],
       }),
       strapi.db.query(REGISTRATION_UID).findMany({
@@ -39,7 +40,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const documentId = (activity as any)?.documentId ?? "";
     const frontendUrl =
       process.env.FRONTEND_URL || "https://www.vienkhongni.com";
-    const expiresAt = new Date(Date.now() + THREE_DAYS_MS);
+    // Use the activity's explicit confirmation deadline if set; otherwise fall
+    // back to a 3-day window from the moment the email is sent.
+    const confirmExpiredDate = (activity as any)?.confirmExpiredDate;
+    const expiresAt = confirmExpiredDate
+      ? new Date(confirmExpiredDate)
+      : new Date(Date.now() + THREE_DAYS_MS);
 
     const formatDateTime = (value: unknown): string =>
       value
@@ -100,11 +106,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         });
 
         const confirmationLink = `${frontendUrl}/activity/${slug}-${documentId}/confirm?code=${newToken}`;
-        const expiryDateStr = expiresAt.toLocaleDateString("vi-VN", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        });
+        const expiryDateStr = formatDateTime(expiresAt);
 
         await strapi.plugins["email"].services.email.send({
           to: email,
