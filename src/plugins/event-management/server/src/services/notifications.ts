@@ -50,6 +50,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const formatDateTime = (value: unknown): string =>
       value
         ? new Date(value as string).toLocaleString("vi-VN", {
+            timeZone: "Asia/Ho_Chi_Minh",
             weekday: "long",
             day: "2-digit",
             month: "2-digit",
