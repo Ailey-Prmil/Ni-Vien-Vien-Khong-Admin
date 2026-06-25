@@ -1,7 +1,8 @@
-import type { Core } from '@strapi/strapi';
+import type { Core } from "@strapi/strapi";
 
-const ACTIVITY_UID = 'api::activity.activity' as const;
-const REGISTRATION_UID = 'api::activity-registration.activity-registration' as const;
+const ACTIVITY_UID = "api::activity.activity" as const;
+const REGISTRATION_UID =
+  "api::activity-registration.activity-registration" as const;
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
@@ -14,7 +15,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   ): Promise<{ promoted: number }> {
     const activity = await strapi.db.query(ACTIVITY_UID).findOne({
       where: { id: activityId },
-      select: ['activityName', 'zaloGroup', 'registrationLimit'],
+      select: ["activityName", "zaloGroup", "registrationLimit"],
     });
 
     // Enforce capacity: cap count to available slots
@@ -23,7 +24,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       const activeCount = await strapi.db.query(REGISTRATION_UID).count({
         where: {
           registeredActivity: { id: activityId },
-          registrationStatus: 'active',
+          registrationStatus: "active",
         },
       });
       const availableSlots = Math.max(0, registrationLimit - activeCount);
@@ -36,17 +37,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const pendingRegs = await strapi.db.query(REGISTRATION_UID).findMany({
       where: {
         registeredActivity: { id: activityId },
-        registrationStatus: 'pending',
+        registrationStatus: "pending",
       },
-      orderBy: { createdAt: 'asc' }, // FIFO
+      orderBy: { createdAt: "asc" }, // FIFO
       limit: count,
       populate: { registreeData: true },
     });
 
-    const activityName = (activity as any)?.activityName ?? '';
+    const activityName = (activity as any)?.activityName ?? "";
     const notificationsService = strapi
-      .plugin('event-management')
-      .service('notifications');
+      .plugin("event-management")
+      .service("notifications");
 
     let promoted = 0;
 
@@ -54,28 +55,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // 1. Change status pending → active
       await strapi.db.query(REGISTRATION_UID).update({
         where: { id: reg.id },
-        data: { registrationStatus: 'active' },
+        data: { registrationStatus: "active" },
       });
-
-      // 2. Send confirmation email with fresh token
-      const email = reg.registreeData?.email;
-      const fullName = reg.registreeData?.fullName;
-
-      if (email) {
-        try {
-          await notificationsService.sendWaitlistPromotionEmail({
-            registrationId: reg.id,
-            email,
-            fullName,
-            activityName,
-          });
-        } catch (err) {
-          strapi.log.error(
-            `[event-management] Failed to notify ${email} after promotion:`,
-            err,
-          );
-        }
-      }
 
       promoted++;
     }
@@ -89,58 +70,44 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    */
   async promoteRegistration(
     registrationId: number,
-  ): Promise<{ promoted: true; registrationId: number } | { error: 'not_found' | 'no_slots' }> {
+  ): Promise<
+    | { promoted: true; registrationId: number }
+    | { error: "not_found" | "no_slots" }
+  > {
     const reg = await strapi.db.query(REGISTRATION_UID).findOne({
-      where: { id: registrationId, registrationStatus: 'pending' },
+      where: { id: registrationId, registrationStatus: "pending" },
       populate: { registreeData: true, registeredActivity: true },
     });
 
-    if (!reg) return { error: 'not_found' };
+    if (!reg) return { error: "not_found" };
 
     // Check capacity
     const activityId = (reg as any).registeredActivity?.id;
     if (activityId) {
       const activity = await strapi.db.query(ACTIVITY_UID).findOne({
         where: { id: activityId },
-        select: ['registrationLimit'],
+        select: ["registrationLimit"],
       });
       const registrationLimit = (activity as any)?.registrationLimit ?? 0;
       if (registrationLimit > 0) {
         const activeCount = await strapi.db.query(REGISTRATION_UID).count({
-          where: { registeredActivity: { id: activityId }, registrationStatus: 'active' },
+          where: {
+            registeredActivity: { id: activityId },
+            registrationStatus: "active",
+          },
         });
-        if (activeCount >= registrationLimit) return { error: 'no_slots' };
+        if (activeCount >= registrationLimit) return { error: "no_slots" };
       }
     }
 
     await strapi.db.query(REGISTRATION_UID).update({
       where: { id: registrationId },
-      data: { registrationStatus: 'active' },
+      data: { registrationStatus: "active" },
     });
 
-    const activityName = (reg as any).registeredActivity?.activityName ?? '';
-    const email = (reg as any).registreeData?.email;
-    const fullName = (reg as any).registreeData?.fullName;
-
-    if (email) {
-      try {
-        const notificationsService = strapi
-          .plugin('event-management')
-          .service('notifications');
-        await notificationsService.sendWaitlistPromotionEmail({
-          registrationId,
-          email,
-          fullName,
-          activityName,
-        });
-      } catch (err) {
-        strapi.log.error(
-          `[event-management] Failed to notify ${email} after manual promotion:`,
-          err,
-        );
-      }
-    }
-
-    return { promoted: true, registrationId } as { promoted: true; registrationId: number };
+    return { promoted: true, registrationId } as {
+      promoted: true;
+      registrationId: number;
+    };
   },
 });

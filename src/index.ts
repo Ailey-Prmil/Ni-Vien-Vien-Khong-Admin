@@ -120,5 +120,46 @@ export default {
         },
       },
     });
+
+    // Every minute — open registration forms whose scheduled open time has passed.
+    // This is a single indexed query per tick (the DB filters; we only loop over
+    // matching rows, normally zero). formOpenedDate is a one-shot trigger: once
+    // the form is opened we clear the date so a later manual close isn't
+    // immediately re-opened by the next tick.
+    strapi.cron.add({
+      openScheduledForms: {
+        task: async () => {
+          try {
+            const now = new Date();
+            const due = await strapi.db.query(ACTIVITY_UID).findMany({
+              where: {
+                formOpened: false,
+                formOpenedDate: { $lte: now },
+                $not: { formOpenedDate: null },
+              },
+              select: ["id"],
+            });
+
+            if (due.length === 0) return;
+
+            for (const act of due as any[]) {
+              await strapi.db.query(ACTIVITY_UID).update({
+                where: { id: act.id },
+                data: { formOpened: true, formOpenedDate: null },
+              });
+            }
+
+            strapi.log.info(
+              `[cron] openScheduledForms: opened ${due.length} registration form(s).`,
+            );
+          } catch (err) {
+            strapi.log.error("[cron] openScheduledForms failed:", err);
+          }
+        },
+        options: {
+          rule: "* * * * *", // every minute
+        },
+      },
+    });
   },
 };

@@ -1,0 +1,109 @@
+<div
+  style="
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    color: #333;
+  "
+>
+  <div
+    style="
+      background-color: #8b4513;
+      padding: 24px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    "
+  >
+    <h2 style="color: #ffffff; margin: 0">Ni Viện Viên Không</h2>
+    <p style="color: #f0e6d2; margin: 6px 0 0; font-size: 14px">
+      Xác nhận đăng ký tham gia sự kiện
+    </p>
+  </div>
+
+  <div
+    style="
+      border: 1px solid #eee;
+      border-top: none;
+      padding: 24px;
+      border-radius: 0 0 8px 8px;
+    "
+  >
+    <p>Kính gửi <strong>${fullName}</strong>,</p>
+    <p>
+      Ban Tổ Chức chân thành cảm ơn Quý vị đã đăng ký tham gia sự kiện
+      <strong>${activityName}</strong>. Chúng tôi xin trân trọng xác nhận Quý vị
+      đã <strong>đăng ký thành công</strong> chương trình.
+    </p>
+
+    <div
+      style="
+        background-color: #faf6f0;
+        border-left: 4px solid #8b4513;
+        padding: 16px 20px;
+        margin: 24px 0;
+        border-radius: 4px;
+      "
+    >
+      <h3 style="color: #8b4513; margin: 0 0 12px">Thông tin chương trình</h3>
+      <p style="margin: 6px 0">
+        <strong>Bắt đầu (Check-in):</strong> ${startStr}
+      </p>
+      <p style="margin: 6px 0">
+        <strong>Kết thúc (Check-out):</strong> ${endStr}
+      </p>
+      <p style="margin: 6px 0">
+        <strong>Địa điểm:</strong> Ni Viện Viên Không – Tổ 2, Ấp 4, Xã Châu Pha,
+        Thành phố Hồ Chí Minh, Việt Nam
+      </p>
+    </div>
+
+    <p>
+      Để Ban Tổ Chức chuẩn bị chu đáo về không gian và công tác tổ chức, kính
+      mong Quý vị vui lòng xác nhận sự tham dự bằng cách nhấp vào nút bên dưới:
+    </p>
+
+    <p style="text-align: center; margin: 30px 0">
+      <a
+        href="${confirmationLink}"
+        style="
+          background-color: #8b4513;
+          color: white;
+          padding: 12px 28px;
+          text-decoration: none;
+          border-radius: 5px;
+          font-weight: bold;
+          display: inline-block;
+        "
+      >
+        Xác nhận tham dự
+      </a>
+    </p>
+
+    <p style="color: #c0392b; font-size: 14px">
+      <strong>Lưu ý:</strong> Link xác nhận sẽ hết hạn vào ngày
+      <strong>${expiryDateStr}</strong>. Nếu không xác nhận trước thời hạn, đăng
+      ký của Quý vị sẽ bị hủy tự động.
+    </p>
+
+    <p>
+      Ban Tổ Chức rất hân hạnh được chào đón Quý vị trong hành trình sắp tới.
+    </p>
+
+    <p style="font-size: 14px">
+      Mọi thông tin chi tiết của chương trình sẽ được cập nhật qua nhóm Zalo:
+      <a href="${zaloGroup}" style="color: #8b4513">${zaloGroup}</a>
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0" />
+    <p style="margin: 4px 0">Trân trọng,</p>
+    <p style="margin: 4px 0; font-weight: bold; color: #8b4513">
+      Ban Tổ Chức – Ni Viện Viên Không
+    </p>
+    <p style="margin: 12px 0 0; font-size: 13px; color: #666">
+      Website:
+      <a href="https://vienkhongni.com" style="color: #8b4513"
+        >vienkhongni.com</a
+      >
+    </p>
+  </div>
+</div>
