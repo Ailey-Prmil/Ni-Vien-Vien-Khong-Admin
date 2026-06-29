@@ -1,13 +1,21 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Box,
   Button,
   Checkbox,
   Flex,
+  IconButton,
   Modal,
   NextLink,
   PageLink,
   Pagination,
+  Popover,
   PreviousLink,
   SingleSelect,
   SingleSelectOption,
@@ -21,8 +29,27 @@ import {
   Typography,
 } from "@strapi/design-system";
 import { useFetchClient, useNotification, useRBAC } from "@strapi/strapi/admin";
-import { Download, Cog, ArrowUp, Check, Cross } from "@strapi/icons";
+import {
+  Download,
+  Cog,
+  ArrowUp,
+  ArrowDown,
+  Check,
+  Cross,
+  Filter,
+  Plus,
+} from "@strapi/icons";
 import { PLUGIN_ID } from "../pluginId";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import {
+  cellText,
+  compareByField,
+  uniqueValues,
+  buildGroupTree,
+  flattenGroupTree,
+  EMPTY_LABEL,
+  type RenderItem,
+} from "../utils/registrationTable";
 
 // ── Column definitions ────────────────────────────────────────────────────────
 
@@ -43,11 +70,6 @@ const FIELD_LABELS: Record<string, string> = {
   zaloName: "Tên hiển thị Zalo",
 };
 
-/** Returns the display label for a field key, falling back to the raw key. */
-function fieldLabel(field: string): string {
-  return FIELD_LABELS[field] ?? field;
-}
-
 const DEFAULT_VISIBLE_FIELDS: string[] = [
   "fullName",
   "registrationStatus",
@@ -56,8 +78,9 @@ const DEFAULT_VISIBLE_FIELDS: string[] = [
   "phoneNumber",
   "zaloName",
 ];
-const MAX_COLUMNS = 10;
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 30;
+const DEFAULT_COL_WIDTH = 180;
+const MIN_COL_WIDTH = 80;
 
 // ── Data types ────────────────────────────────────────────────────────────────
 
@@ -77,12 +100,40 @@ interface Registration {
   registrationPayload?: Record<string, Record<string, any>>;
 }
 
+/** Selected values for a column's checklist filter (empty array = no filter). */
+type ColumnFilter = string[];
+
+interface PersistedView {
+  visibleColumns: string[];
+  columnWidths: Record<string, number>;
+  columnFilters: Record<string, ColumnFilter>;
+  groupBy: string[];
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+}
+
+const DEFAULT_VIEW: PersistedView = {
+  visibleColumns: DEFAULT_VISIBLE_FIELDS,
+  columnWidths: {},
+  columnFilters: {},
+  groupBy: [],
+  sortBy: "createdAt",
+  sortOrder: "asc",
+};
+
 interface RegistrationTableProps {
   activityId: number;
   reloadKey?: number;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Returns the display label for a field key, falling back to the raw key. */
+function fieldLabel(field: string, available: FieldDescriptor[]): string {
+  if (FIELD_LABELS[field]) return FIELD_LABELS[field];
+  const found = available.find((f) => f.key === field);
+  return found?.label ?? field;
+}
 
 function statusColor(status: string) {
   if (status === "active") return "success600";
@@ -125,41 +176,80 @@ function ColumnPickerModal({
     );
   }
 
+  function move(index: number, dir: -1 | 1) {
+    setLocal((prev) => {
+      const next = [...prev];
+      const target = index + dir;
+      if (target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+
+  // Fields not yet selected, in their natural discovery order.
+  const unselected = availableFields.filter((f) => !local.includes(f.key));
+
   return (
     <Modal.Root open={open} onOpenChange={(v: boolean) => !v && onClose()}>
       <Modal.Content>
         <Modal.Header>
-          <Typography variant="beta">
-            Choose visible columns (max {MAX_COLUMNS})
-          </Typography>
+          <Typography variant="beta">Chọn & sắp xếp cột</Typography>
         </Modal.Header>
         <Modal.Body>
-          <Flex wrap="wrap" gap={3}>
-            {availableFields.map((field) => {
-              const checked = local.includes(field.key);
-              const disabled = !checked && local.length >= MAX_COLUMNS;
-              return (
-                <Box key={field.key} style={{ minWidth: 160 }}>
-                  <Checkbox
-                    checked={checked}
-                    disabled={disabled}
-                    onCheckedChange={() => !disabled && toggle(field.key)}
+          <Typography variant="delta">
+            Cột đang hiện (kéo thứ tự bằng nút)
+          </Typography>
+          <Box marginTop={2} marginBottom={4}>
+            {local.length === 0 && (
+              <Typography textColor="neutral500">Chưa chọn cột nào.</Typography>
+            )}
+            {local.map((key, index) => (
+              <Flex
+                key={key}
+                justifyContent="space-between"
+                alignItems="center"
+                paddingTop={1}
+                paddingBottom={1}
+              >
+                <Checkbox checked onCheckedChange={() => toggle(key)}>
+                  {fieldLabel(key, availableFields)}
+                </Checkbox>
+                <Flex gap={1}>
+                  <IconButton
+                    label="Lên"
+                    disabled={index === 0}
+                    onClick={() => move(index, -1)}
                   >
-                    {field.label}
-                  </Checkbox>
-                </Box>
-              );
-            })}
-          </Flex>
-          {local.length >= MAX_COLUMNS && (
-            <Typography
-              variant="pi"
-              textColor="neutral500"
-              style={{ marginTop: 12 }}
-            >
-              Maximum {MAX_COLUMNS} columns selected. Deselect one to enable
-              others.
-            </Typography>
+                    <ArrowUp />
+                  </IconButton>
+                  <IconButton
+                    label="Xuống"
+                    disabled={index === local.length - 1}
+                    onClick={() => move(index, 1)}
+                  >
+                    <ArrowDown />
+                  </IconButton>
+                </Flex>
+              </Flex>
+            ))}
+          </Box>
+
+          {unselected.length > 0 && (
+            <>
+              <Typography variant="delta">Cột ẩn</Typography>
+              <Flex wrap="wrap" gap={3} marginTop={2}>
+                {unselected.map((field) => (
+                  <Box key={field.key} style={{ minWidth: 160 }}>
+                    <Checkbox
+                      checked={false}
+                      onCheckedChange={() => toggle(field.key)}
+                    >
+                      {field.label}
+                    </Checkbox>
+                  </Box>
+                ))}
+              </Flex>
+            </>
           )}
         </Modal.Body>
         <Modal.Footer>
@@ -249,6 +339,114 @@ function FieldPickerModal({
   );
 }
 
+// ── Per-column filter control ─────────────────────────────────────────────────
+
+interface ColumnFilterControlProps {
+  field: string;
+  filter: ColumnFilter | undefined;
+  /** Distinct values available for this column (for the checklist). */
+  options: string[];
+  onChange: (filter: ColumnFilter | undefined) => void;
+}
+
+function ColumnFilterControl({
+  field,
+  filter,
+  options,
+  onChange,
+}: ColumnFilterControlProps) {
+  const [open, setOpen] = useState(false);
+  const [optionSearch, setOptionSearch] = useState("");
+
+  const selected = filter ?? [];
+  const active = selected.length > 0;
+
+  const shown = optionSearch
+    ? options.filter((o) =>
+        (o === "" ? EMPTY_LABEL : o)
+          .toLowerCase()
+          .includes(optionSearch.toLowerCase()),
+      )
+    : options;
+
+  function toggleValue(value: string) {
+    const next = selected.includes(value)
+      ? selected.filter((v) => v !== value)
+      : [...selected, value];
+    onChange(next);
+  }
+
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger>
+        <button
+          type="button"
+          aria-label={`Lọc ${field}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            width: "100%",
+            padding: "4px 8px",
+            fontSize: 12,
+            cursor: "pointer",
+            border: "1px solid",
+            borderColor: active ? "#4945ff" : "#dcdce4",
+            borderRadius: 4,
+            background: active ? "#f0f0ff" : "#ffffff",
+            color: "#32324d",
+          }}
+        >
+          <Filter width="12px" height="12px" />
+          {active ? `Đã chọn ${selected.length}` : "Lọc"}
+        </button>
+      </Popover.Trigger>
+      <Popover.Content>
+        <Box
+          padding={2}
+          style={{ maxHeight: 320, overflowY: "auto", minWidth: 200 }}
+        >
+          <TextInput
+            aria-label="Tìm giá trị"
+            placeholder="Tìm giá trị…"
+            size="S"
+            value={optionSearch}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setOptionSearch(e.target.value)
+            }
+          />
+          <Flex gap={2} marginTop={2} marginBottom={2}>
+            <Button
+              size="S"
+              variant="ghost"
+              onClick={() => onChange([...options])}
+            >
+              Chọn tất cả
+            </Button>
+            <Button
+              size="S"
+              variant="ghost"
+              onClick={() => onChange(undefined)}
+            >
+              Bỏ chọn
+            </Button>
+          </Flex>
+          {shown.map((value) => (
+            <Box key={value || "__empty__"} paddingTop={1} paddingBottom={1}>
+              <Checkbox
+                checked={selected.includes(value)}
+                onCheckedChange={() => toggleValue(value)}
+              >
+                {value === "" ? EMPTY_LABEL : value}
+              </Checkbox>
+            </Box>
+          ))}
+        </Box>
+      </Popover.Content>
+    </Popover.Root>
+  );
+}
+
 // ── Action confirmation modal ─────────────────────────────────────────────────
 
 type ActionType = "promote" | "confirm" | "cancel";
@@ -334,6 +532,84 @@ function ConfirmActionModal({
   );
 }
 
+// ── Group-by panel ────────────────────────────────────────────────────────────
+
+interface GroupByPanelProps {
+  groupBy: string[];
+  visibleColumns: string[];
+  availableFields: FieldDescriptor[];
+  onChange: (groupBy: string[]) => void;
+}
+
+function GroupByPanel({
+  groupBy,
+  visibleColumns,
+  availableFields,
+  onChange,
+}: GroupByPanelProps) {
+  function setLevel(index: number, field: string) {
+    const next = [...groupBy];
+    next[index] = field;
+    onChange(next.filter(Boolean));
+  }
+  function removeLevel(index: number) {
+    onChange(groupBy.filter((_, i) => i !== index));
+  }
+  function addLevel() {
+    const firstUnused = visibleColumns.find((c) => !groupBy.includes(c));
+    if (firstUnused) onChange([...groupBy, firstUnused]);
+  }
+
+  const canAdd = visibleColumns.some((c) => !groupBy.includes(c));
+
+  return (
+    <Flex gap={2} alignItems="center" wrap="wrap">
+      <Typography variant="pi" textColor="neutral600">
+        Gom nhóm:
+      </Typography>
+      {groupBy.map((field, index) => (
+        <Flex key={`${field}-${index}`} gap={1} alignItems="center">
+          <SingleSelect
+            size="S"
+            value={field}
+            onChange={(val: string | number) =>
+              setLevel(index, String(val ?? ""))
+            }
+          >
+            {visibleColumns.map((c) => (
+              <SingleSelectOption key={c} value={c}>
+                {fieldLabel(c, availableFields)}
+              </SingleSelectOption>
+            ))}
+          </SingleSelect>
+          <IconButton
+            label="Xoá cấp"
+            size="S"
+            onClick={() => removeLevel(index)}
+          >
+            <Cross />
+          </IconButton>
+        </Flex>
+      ))}
+      {canAdd && (
+        <Button
+          size="S"
+          variant="tertiary"
+          startIcon={<Plus />}
+          onClick={addLevel}
+        >
+          Thêm cấp
+        </Button>
+      )}
+      {groupBy.length > 0 && (
+        <Button size="S" variant="ghost" onClick={() => onChange([])}>
+          Bỏ gom nhóm
+        </Button>
+      )}
+    </Flex>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function RegistrationTable({
@@ -350,29 +626,44 @@ export function RegistrationTable({
     ],
   });
 
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  // All registrations for the activity (fetched once, processed client-side).
+  const [allRegistrations, setAllRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
 
-  // Filters & sort
+  // Quick filters & global search
   const [statusFilter, setStatusFilter] = useState("");
   const [confirmedFilter, setConfirmedFilter] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("registeredAt");
-  const [sortOrder, setSortOrder] = useState("asc");
 
-  // Column visibility
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(
-    DEFAULT_VISIBLE_FIELDS,
+  // ── Persisted per-activity view state ──
+  const viewKey = `em:reg-table:view:v1:${activityId}`;
+  const [view, setView] = useLocalStorage<PersistedView>(viewKey, DEFAULT_VIEW);
+  const {
+    visibleColumns,
+    columnWidths,
+    columnFilters,
+    groupBy,
+    sortBy,
+    sortOrder,
+  } = view;
+
+  const patchView = useCallback(
+    (patch: Partial<PersistedView>) =>
+      setView((prev) => ({ ...prev, ...patch })),
+    [setView],
   );
+
   const [colPickerOpen, setColPickerOpen] = useState(false);
 
-  // Shared available-fields state (used by both column picker and export)
+  // Collapsed group paths (session-only, not persisted)
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    new Set(),
+  );
+
+  // Shared available-fields state (used by column picker, filters, export)
   const [availableFields, setAvailableFields] = useState<FieldDescriptor[]>([]);
-  const [loadingFields, setLoadingFields] = useState(false);
 
   // Export field picker
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -382,8 +673,6 @@ export function RegistrationTable({
   const [promotingId, setPromotingId] = useState<number | null>(null);
   const [confirmingId, setConfirmingId] = useState<number | null>(null);
   const [cancelingId, setCancelingId] = useState<number | null>(null);
-
-  // Pending action awaiting admin confirmation in dialog
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(
     null,
   );
@@ -397,6 +686,140 @@ export function RegistrationTable({
     return () => clearTimeout(t);
   }, [searchInput]);
 
+  // ── Data fetching: all rows + field list ──
+  const fetchRegistrations = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await get(
+        `/${PLUGIN_ID}/activities/${activityId}/registrations`,
+        { params: { pageSize: "100000", page: "1" } },
+      );
+      const result = (res as any).data;
+      setAllRegistrations(result?.data ?? []);
+    } catch {
+      toggleNotification({
+        type: "danger",
+        message: "Failed to load registrations",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [activityId, reloadKey]);
+
+  useEffect(() => {
+    fetchRegistrations();
+  }, [fetchRegistrations]);
+
+  /** Fetches available fields once and caches in state. */
+  const ensureAvailableFields = useCallback(async (): Promise<
+    FieldDescriptor[] | null
+  > => {
+    if (availableFields.length > 0) return availableFields;
+    try {
+      const res = await get(
+        `/${PLUGIN_ID}/activities/${activityId}/available-fields`,
+      );
+      const fields: FieldDescriptor[] = (res as any).data?.data ?? [];
+      setAvailableFields(fields);
+      return fields;
+    } catch {
+      toggleNotification({
+        type: "danger",
+        message: "Failed to load field list",
+      });
+      return null;
+    }
+  }, [activityId, availableFields]);
+
+  // Load the field list up-front (needed for labels, filters, grouping).
+  useEffect(() => {
+    ensureAvailableFields();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activityId]);
+
+  // ── Client-side processing pipeline ──
+
+  // 1) global search + quick status/confirmed filters
+  const baseFiltered = useMemo(() => {
+    let rows = allRegistrations;
+    if (statusFilter)
+      rows = rows.filter((r) => r.registrationStatus === statusFilter);
+    if (statusFilter === "active" && confirmedFilter !== "") {
+      const want = confirmedFilter === "true";
+      rows = rows.filter((r) => r.confirmed === want);
+    }
+    if (search) {
+      const q = search.toLowerCase();
+      rows = rows.filter((r) => {
+        const d = r.registreeData ?? {};
+        return (
+          String(d.fullName ?? "")
+            .toLowerCase()
+            .includes(q) ||
+          String(d.phoneNumber ?? "")
+            .toLowerCase()
+            .includes(q) ||
+          String(d.email ?? "")
+            .toLowerCase()
+            .includes(q)
+        );
+      });
+    }
+    return rows;
+  }, [allRegistrations, statusFilter, confirmedFilter, search]);
+
+  // Distinct values per visible column (for checklist filters + auto mode).
+  const columnOptions = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    for (const col of visibleColumns) {
+      map[col] = uniqueValues(baseFiltered, col);
+    }
+    return map;
+  }, [baseFiltered, visibleColumns]);
+
+  // 2) per-column filters
+  const columnFiltered = useMemo(() => {
+    const entries = Object.entries(columnFilters);
+    if (entries.length === 0) return baseFiltered;
+    return baseFiltered.filter((reg) =>
+      entries.every(([field, values]) => {
+        if (values.length === 0) return true;
+        return values.includes(cellText(reg, field));
+      }),
+    );
+  }, [baseFiltered, columnFilters]);
+
+  // 3) sort
+  const sorted = useMemo(() => {
+    return [...columnFiltered].sort((a, b) =>
+      compareByField(a, b, sortBy, sortOrder),
+    );
+  }, [columnFiltered, sortBy, sortOrder]);
+
+  const grouping = groupBy.length > 0;
+
+  // 4a) grouped render items (no pagination when grouping)
+  const groupedItems = useMemo<RenderItem[]>(() => {
+    if (!grouping) return [];
+    const tree = buildGroupTree(sorted, groupBy);
+    return flattenGroupTree(tree, collapsedGroups);
+  }, [grouping, sorted, groupBy, collapsedGroups]);
+
+  // 4b) paginated rows when not grouping
+  const total = sorted.length;
+  const totalPages = grouping ? 1 : Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const pagedRows = useMemo(() => {
+    if (grouping) return [];
+    const start = (page - 1) * PAGE_SIZE;
+    return sorted.slice(start, start + PAGE_SIZE);
+  }, [grouping, sorted, page]);
+
+  // Keep page in range when the result set shrinks.
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
+  // ── Row actions ──
   const handlePromoteRow = async (registrationId: number) => {
     setPromotingId(registrationId);
     try {
@@ -463,73 +886,6 @@ export function RegistrationTable({
     }
   };
 
-  const fetchRegistrations = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params: Record<string, string> = {
-        sortBy,
-        sortOrder,
-        page: String(page),
-        pageSize: String(PAGE_SIZE),
-      };
-      if (statusFilter) params.status = statusFilter;
-      if (statusFilter === "active" && confirmedFilter !== "")
-        params.confirmed = confirmedFilter;
-      if (search) params.search = search;
-
-      const res = await get(
-        `/${PLUGIN_ID}/activities/${activityId}/registrations`,
-        { params },
-      );
-      const result = (res as any).data;
-      setRegistrations(result?.data ?? []);
-      setTotalPages(result?.meta?.pagination?.pageCount ?? 1);
-      setTotal(result?.meta?.pagination?.total ?? 0);
-    } catch {
-      toggleNotification({
-        type: "danger",
-        message: "Failed to load registrations",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    activityId,
-    statusFilter,
-    confirmedFilter,
-    search,
-    sortBy,
-    sortOrder,
-    page,
-    reloadKey,
-  ]);
-
-  useEffect(() => {
-    fetchRegistrations();
-  }, [fetchRegistrations]);
-
-  /** Fetches available fields from the backend (once) and caches in state. */
-  async function ensureAvailableFields(): Promise<FieldDescriptor[] | null> {
-    if (availableFields.length > 0) return availableFields;
-    setLoadingFields(true);
-    try {
-      const res = await get(
-        `/${PLUGIN_ID}/activities/${activityId}/available-fields`,
-      );
-      const fields: FieldDescriptor[] = (res as any).data?.data ?? [];
-      setAvailableFields(fields);
-      return fields;
-    } catch {
-      toggleNotification({
-        type: "danger",
-        message: "Failed to load field list",
-      });
-      return null;
-    } finally {
-      setLoadingFields(false);
-    }
-  }
-
   function handleStatusChange(val: string | number) {
     const v = String(val ?? "");
     setStatusFilter(v);
@@ -559,9 +915,7 @@ export function RegistrationTable({
         { params: { fields: selectedFields.join(",") } },
       );
       const csv: string = (res as any).data?.data ?? "";
-      const blob = new Blob([csv], {
-        type: "text/csv;charset=utf-8;",
-      });
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const blobUrl = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = blobUrl;
@@ -575,8 +929,79 @@ export function RegistrationTable({
     }
   };
 
+  // ── Filter / sort / group helpers ──
+  function setColumnFilter(field: string, filter: ColumnFilter | undefined) {
+    const next = { ...columnFilters };
+    if (filter === undefined || filter.length === 0) delete next[field];
+    else next[field] = filter;
+    patchView({ columnFilters: next });
+    setPage(1);
+  }
+
+  function clearAllFilters() {
+    patchView({ columnFilters: {} });
+    setPage(1);
+  }
+
+  function toggleSort(field: string) {
+    if (sortBy === field) {
+      patchView({ sortOrder: sortOrder === "asc" ? "desc" : "asc" });
+    } else {
+      patchView({ sortBy: field, sortOrder: "asc" });
+    }
+  }
+
+  function toggleGroupCollapse(path: string) {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
+      return next;
+    });
+  }
+
+  // ── Column resize (drag the right edge of a header) ──
+  // Handlers are created per-drag so add/removeEventListener share the exact
+  // same reference, avoiding leaked listeners across re-renders.
+  function onResizeStart(e: React.MouseEvent, field: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startW = columnWidths[field] ?? DEFAULT_COL_WIDTH;
+    const onMove = (ev: MouseEvent) => {
+      const width = Math.max(MIN_COL_WIDTH, startW + (ev.clientX - startX));
+      setView((prev) => ({
+        ...prev,
+        columnWidths: { ...prev.columnWidths, [field]: width },
+      }));
+    };
+    const onEnd = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onEnd);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+  }
+
+  // ── Column reorder (drag a header onto another) ──
+  const dragField = useRef<string | null>(null);
+  function onColDragStart(field: string) {
+    dragField.current = field;
+  }
+  function onColDrop(targetField: string) {
+    const from = dragField.current;
+    dragField.current = null;
+    if (!from || from === targetField) return;
+    const next = [...visibleColumns];
+    const fromIdx = next.indexOf(from);
+    const toIdx = next.indexOf(targetField);
+    if (fromIdx === -1 || toIdx === -1) return;
+    next.splice(fromIdx, 1);
+    next.splice(toIdx, 0, from);
+    patchView({ visibleColumns: next });
+  }
+
   function renderCell(reg: Registration, field: string) {
-    // Fixed meta fields with special rendering
     switch (field) {
       case "id":
         return <Typography>{reg.id}</Typography>;
@@ -614,7 +1039,6 @@ export function RegistrationTable({
         );
     }
 
-    // registreeData fields
     if (reg.registreeData && field in reg.registreeData) {
       const val = reg.registreeData[field];
       if (typeof val === "boolean") {
@@ -623,7 +1047,6 @@ export function RegistrationTable({
       return <Typography>{val ?? "—"}</Typography>;
     }
 
-    // registrationPayload fields — key format is sectionKey__fieldKey
     if (field.includes("__") && reg.registrationPayload) {
       const sep = field.indexOf("__");
       const sectionKey = field.slice(0, sep);
@@ -641,6 +1064,101 @@ export function RegistrationTable({
   const anyActionInProgress =
     promotingId !== null || confirmingId !== null || cancelingId !== null;
 
+  const colCount = visibleColumns.length + 1;
+
+  function renderActionCell(reg: Registration) {
+    return (
+      <Flex gap={1}>
+        {allowedActions.canManageWaitlist &&
+          reg.registrationStatus === "pending" && (
+            <Button
+              size="S"
+              variant="secondary"
+              startIcon={<ArrowUp />}
+              loading={promotingId === reg.id}
+              disabled={anyActionInProgress}
+              onClick={() =>
+                setPendingAction({
+                  type: "promote",
+                  registrationId: reg.id,
+                  name: reg.registreeData?.fullName ?? "",
+                })
+              }
+            >
+              Promote
+            </Button>
+          )}
+        {allowedActions.canManageRegistrations &&
+          reg.registrationStatus === "active" &&
+          reg.confirmed !== true && (
+            <Button
+              size="S"
+              variant="secondary"
+              startIcon={<Check />}
+              loading={confirmingId === reg.id}
+              disabled={anyActionInProgress}
+              onClick={() =>
+                setPendingAction({
+                  type: "confirm",
+                  registrationId: reg.id,
+                  name: reg.registreeData?.fullName ?? "",
+                })
+              }
+            >
+              Confirm
+            </Button>
+          )}
+        {allowedActions.canManageRegistrations &&
+          reg.registrationStatus !== "canceled" && (
+            <Button
+              size="S"
+              variant="danger-light"
+              startIcon={<Cross />}
+              loading={cancelingId === reg.id}
+              disabled={anyActionInProgress}
+              onClick={() =>
+                setPendingAction({
+                  type: "cancel",
+                  registrationId: reg.id,
+                  name: reg.registreeData?.fullName ?? "",
+                })
+              }
+            >
+              Cancel
+            </Button>
+          )}
+      </Flex>
+    );
+  }
+
+  function renderDataRow(reg: Registration) {
+    return (
+      <Tr key={reg.id}>
+        {visibleColumns.map((col) => {
+          const width = columnWidths[col] ?? DEFAULT_COL_WIDTH;
+          return (
+            <Td key={col} style={{ maxWidth: width }}>
+              <div
+                title={cellText(reg, col)}
+                style={{
+                  width,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {renderCell(reg, col)}
+              </div>
+            </Td>
+          );
+        })}
+        <Td>{renderActionCell(reg)}</Td>
+      </Tr>
+    );
+  }
+
+  const hasActiveColumnFilters = Object.keys(columnFilters).length > 0;
+
   return (
     <Box background="neutral100" padding={5} borderRadius="4px">
       {/* ── Header row ── */}
@@ -654,31 +1172,27 @@ export function RegistrationTable({
           )}
         </Flex>
         <Flex gap={2}>
+          <Button
+            variant="ghost"
+            startIcon={<Cog />}
+            onClick={handleOpenColumnPicker}
+          >
+            Columns
+          </Button>
           {allowedActions.canExport && (
-            <>
-              <Button
-                variant="ghost"
-                startIcon={<Cog />}
-                onClick={handleOpenColumnPicker}
-                loading={loadingFields}
-              >
-                Columns
-              </Button>
-              <Button
-                variant="secondary"
-                startIcon={<Download />}
-                onClick={handleOpenExport}
-                loading={loadingFields}
-              >
-                Export CSV
-              </Button>
-            </>
+            <Button
+              variant="secondary"
+              startIcon={<Download />}
+              onClick={handleOpenExport}
+            >
+              Export CSV
+            </Button>
           )}
         </Flex>
       </Flex>
 
-      {/* ── Search + Filters ── */}
-      <Flex gap={3} marginBottom={4} wrap="wrap">
+      {/* ── Search + quick filters ── */}
+      <Flex gap={3} marginBottom={3} wrap="wrap">
         <TextInput
           placeholder="Search name, phone, email…"
           value={searchInput}
@@ -709,138 +1223,179 @@ export function RegistrationTable({
           </SingleSelect>
         )}
 
-        <SingleSelect
-          value={sortBy}
-          onChange={(val: string | number) => {
-            setSortBy(String(val ?? "registeredAt"));
-            setPage(1);
-          }}
-        >
-          <SingleSelectOption value="id">Sort by ID</SingleSelectOption>
-          <SingleSelectOption value="fullName">
-            Sort by Full Name
-          </SingleSelectOption>
-          <SingleSelectOption value="dob">Sort by DOB</SingleSelectOption>
-          <SingleSelectOption value="registeredAt">
-            Sort by Registered At
-          </SingleSelectOption>
-        </SingleSelect>
-
-        <SingleSelect
-          value={sortOrder}
-          onChange={(val: string | number) => {
-            setSortOrder(String(val ?? "asc"));
-            setPage(1);
-          }}
-        >
-          <SingleSelectOption value="asc">Ascending</SingleSelectOption>
-          <SingleSelectOption value="desc">Descending</SingleSelectOption>
-        </SingleSelect>
+        {hasActiveColumnFilters && (
+          <Button variant="ghost" onClick={clearAllFilters}>
+            Xoá lọc
+          </Button>
+        )}
       </Flex>
+
+      {/* ── Group-by panel ── */}
+      <Box marginBottom={4}>
+        <GroupByPanel
+          groupBy={groupBy}
+          visibleColumns={visibleColumns}
+          availableFields={availableFields}
+          onChange={(g) => patchView({ groupBy: g })}
+        />
+      </Box>
 
       {/* ── Table ── */}
       {loading ? (
         <Typography>Loading registrations…</Typography>
-      ) : registrations.length === 0 ? (
-        <Box padding={6} style={{ textAlign: "center" }}>
-          <Typography>No registrations found.</Typography>
-        </Box>
       ) : (
-        <Table
-          colCount={visibleColumns.length + 1}
-          rowCount={registrations.length}
-        >
-          <Thead>
-            <Tr>
-              {visibleColumns.map((col) => (
-                <Th key={col}>
-                  <Typography variant="sigma">{fieldLabel(col)}</Typography>
+        <Box style={{ overflowX: "auto", width: "100%" }}>
+          <Table colCount={colCount} rowCount={Math.max(total, 1)}>
+            <Thead>
+              <Tr>
+                {visibleColumns.map((col) => {
+                  const width = columnWidths[col] ?? DEFAULT_COL_WIDTH;
+                  const label = fieldLabel(col, availableFields);
+                  return (
+                    <Th
+                      key={col}
+                      style={{
+                        width,
+                        minWidth: width,
+                        maxWidth: width,
+                        position: "relative",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Flex
+                        gap={1}
+                        alignItems="center"
+                        draggable
+                        onDragStart={() => onColDragStart(col)}
+                        onDragOver={(e: React.DragEvent) => e.preventDefault()}
+                        onDrop={() => onColDrop(col)}
+                        style={{ cursor: "grab", minWidth: 0 }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => toggleSort(col)}
+                          title={label}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            padding: 0,
+                            paddingRight: 8,
+                            cursor: "pointer",
+                            font: "inherit",
+                            flex: 1,
+                            minWidth: 0,
+                            display: "block",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            textAlign: "left",
+                          }}
+                        >
+                          <Typography variant="sigma">
+                            {label}
+                            {sortBy === col
+                              ? sortOrder === "asc"
+                                ? " ▲"
+                                : " ▼"
+                              : ""}
+                          </Typography>
+                        </button>
+                      </Flex>
+                      {/* resize handle */}
+                      <span
+                        onMouseDown={(e) => onResizeStart(e, col)}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          right: 0,
+                          height: "100%",
+                          width: 6,
+                          cursor: "col-resize",
+                          userSelect: "none",
+                        }}
+                      />
+                    </Th>
+                  );
+                })}
+                <Th>
+                  <Typography variant="sigma">Actions</Typography>
                 </Th>
-              ))}
-              <Th>
-                <Typography variant="sigma">Actions</Typography>
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {registrations.map((reg) => (
-              <Tr key={reg.id}>
-                {visibleColumns.map((col) => (
-                  <Td key={col}>{renderCell(reg, col)}</Td>
-                ))}
-                <Td>
-                  <Flex gap={1}>
-                    {allowedActions.canManageWaitlist &&
-                      reg.registrationStatus === "pending" && (
-                        <Button
-                          size="S"
-                          variant="secondary"
-                          startIcon={<ArrowUp />}
-                          loading={promotingId === reg.id}
-                          disabled={anyActionInProgress}
-                          onClick={() =>
-                            setPendingAction({
-                              type: "promote",
-                              registrationId: reg.id,
-                              name: reg.registreeData?.fullName ?? "",
-                            })
-                          }
-                        >
-                          Promote
-                        </Button>
-                      )}
-                    {allowedActions.canManageRegistrations &&
-                      reg.registrationStatus === "active" &&
-                      reg.confirmed !== true && (
-                        <Button
-                          size="S"
-                          variant="secondary"
-                          startIcon={<Check />}
-                          loading={confirmingId === reg.id}
-                          disabled={anyActionInProgress}
-                          onClick={() =>
-                            setPendingAction({
-                              type: "confirm",
-                              registrationId: reg.id,
-                              name: reg.registreeData?.fullName ?? "",
-                            })
-                          }
-                        >
-                          Confirm
-                        </Button>
-                      )}
-                    {allowedActions.canManageRegistrations &&
-                      reg.registrationStatus !== "canceled" && (
-                        <Button
-                          size="S"
-                          variant="danger-light"
-                          startIcon={<Cross />}
-                          loading={cancelingId === reg.id}
-                          disabled={anyActionInProgress}
-                          onClick={() =>
-                            setPendingAction({
-                              type: "cancel",
-                              registrationId: reg.id,
-                              name: reg.registreeData?.fullName ?? "",
-                            })
-                          }
-                        >
-                          Cancel
-                        </Button>
-                      )}
-                  </Flex>
-                </Td>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
+              {/* per-column filter row */}
+              <Tr>
+                {visibleColumns.map((col) => (
+                  <Th key={col} style={{ whiteSpace: "nowrap" }}>
+                    <ColumnFilterControl
+                      field={col}
+                      filter={columnFilters[col]}
+                      options={columnOptions[col] ?? []}
+                      onChange={(f) => setColumnFilter(col, f)}
+                    />
+                  </Th>
+                ))}
+                <Th>
+                  <Box />
+                </Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {total === 0 ? (
+                <Tr>
+                  <Td colSpan={colCount}>
+                    <Box padding={6} style={{ textAlign: "center" }}>
+                      <Typography textColor="neutral500">
+                        No registrations found.
+                      </Typography>
+                    </Box>
+                  </Td>
+                </Tr>
+              ) : grouping ? (
+                groupedItems.map((item) =>
+                  item.type === "group" ? (
+                    <Tr key={`g-${item.path}`}>
+                      <Td colSpan={colCount}>
+                        <Flex
+                          gap={2}
+                          alignItems="center"
+                          style={{ paddingLeft: item.level * 24 }}
+                        >
+                          <IconButton
+                            label={item.collapsed ? "Mở rộng" : "Thu gọn"}
+                            size="S"
+                            variant="ghost"
+                            onClick={() => toggleGroupCollapse(item.path)}
+                          >
+                            {item.collapsed ? <ArrowDown /> : <ArrowUp />}
+                          </IconButton>
+                          <Typography variant="omega" fontWeight="bold">
+                            {fieldLabel(item.field, availableFields)}:{" "}
+                            {item.value === "" ? EMPTY_LABEL : item.value}
+                          </Typography>
+                          <Typography variant="pi" textColor="neutral500">
+                            ({item.count})
+                          </Typography>
+                        </Flex>
+                      </Td>
+                    </Tr>
+                  ) : (
+                    renderDataRow(item.reg)
+                  ),
+                )
+              ) : (
+                pagedRows.map((reg) => renderDataRow(reg))
+              )}
+            </Tbody>
+          </Table>
+        </Box>
       )}
 
-      {/* ── Pagination ── */}
-      {totalPages > 1 && (
+      {/* ── Pagination (only when not grouping) ── */}
+      {!grouping && totalPages > 1 && (
         <Flex justifyContent="center" paddingTop={4}>
           <Pagination activePage={page} pageCount={totalPages}>
-            <PreviousLink onClick={() => setPage((p) => Math.max(1, p - 1))} />
+            <PreviousLink onClick={() => setPage((p) => Math.max(1, p - 1))}>
+              Trang trước
+            </PreviousLink>
             {Array.from({ length: totalPages }, (_, i) => (
               <PageLink
                 key={i + 1}
@@ -852,7 +1407,9 @@ export function RegistrationTable({
             ))}
             <NextLink
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            />
+            >
+              Trang sau
+            </NextLink>
           </Pagination>
         </Flex>
       )}
@@ -862,7 +1419,7 @@ export function RegistrationTable({
         open={colPickerOpen}
         availableFields={availableFields}
         visible={visibleColumns}
-        onChange={setVisibleColumns}
+        onChange={(cols) => patchView({ visibleColumns: cols })}
         onClose={() => setColPickerOpen(false)}
       />
 
