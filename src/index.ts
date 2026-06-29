@@ -140,6 +140,11 @@ export default {
               select: ["id"],
             });
 
+            // TEMP DIAGNOSTIC — proves the tick fires and how many rows match.
+            strapi.log.info(
+              `[cron] openScheduledForms tick @ ${now.toISOString()} — ${due.length} due`,
+            );
+
             if (due.length === 0) return;
 
             for (const act of due as any[]) {
@@ -161,5 +166,10 @@ export default {
         },
       },
     });
+
+    // TEMP DIAGNOSTIC — confirms bootstrap ran and cron jobs were registered.
+    strapi.log.info(
+      "[bootstrap] cron jobs registered: openScheduledForms (* * * * *), cancelExpiredRegistrations (0 2 * * *)",
+    );
   },
 };
