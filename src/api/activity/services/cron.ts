@@ -33,7 +33,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         `[cron] openScheduledForms tick @ ${now.toISOString()} — ${due.length} due`,
       );
 
-      if (due.length === 0) return;
+      if (due.length === 0) return { opened: 0 };
 
       for (const act of due as any[]) {
         await strapi.db.query(ACTIVITY_UID).update({
@@ -45,8 +45,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       strapi.log.info(
         `[cron] openScheduledForms: opened ${due.length} registration form(s).`,
       );
+      return { opened: due.length };
     } catch (err) {
       strapi.log.error("[cron] openScheduledForms failed:", err);
+      return { opened: 0, error: String(err) };
     }
   },
 
@@ -64,7 +66,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         select: ["id"],
       });
 
-      if (expired.length === 0) return;
+      if (expired.length === 0) return { canceled: 0 };
 
       for (const reg of expired as any[]) {
         await strapi.db.query(REGISTRATION_UID).update({
@@ -80,8 +82,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       strapi.log.info(
         `[cron] cancelExpiredRegistrations: canceled ${expired.length} expired registration(s).`,
       );
+      return { canceled: expired.length };
     } catch (err) {
       strapi.log.error("[cron] cancelExpiredRegistrations failed:", err);
+      return { canceled: 0, error: String(err) };
     }
   },
 });
