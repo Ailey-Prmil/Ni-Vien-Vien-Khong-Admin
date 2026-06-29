@@ -7,76 +7,84 @@ const REGISTRATION_UID =
 export default {
   register(/* { strapi }: { strapi: Core.Strapi } */) {},
 
-  bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    // ── Re-link registrations when an activity is republished ─────────────────
-    // Strapi v5 publish creates a new DB row (new numeric id) for the published
-    // version and cascades deletes the old published row's relation links.
-    // We intercept via document service middleware on the publish action.
-    (strapi as any).documents.use(
-      async (context: any, next: () => Promise<any>) => {
-        if (context.uid !== ACTIVITY_UID || context.action !== "publish") {
-          return next();
-        }
+  async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    // ── One-time idempotent consolidation onto the stable draft row ───────────
+    // In Strapi v5, draft and published versions of an activity are separate DB
+    // rows sharing a documentId. The published row is deleted/recreated on every
+    // publish & unpublish, which orphans registrations linked to it. We now
+    // anchor every registration to the draft row (see the activity-registration
+    // beforeCreate lifecycle), which is never deleted across publish/unpublish.
+    //
+    // This routine moves any pre-existing registration that is still linked to a
+    // PUBLISHED row onto its document's draft row. It is safe to run on every
+    // boot: registrations already on a draft row are skipped, so it no-ops once
+    // the data is consolidated.
+    try {
+      // Cache of documentId(+locale) → draft row id to avoid repeated lookups.
+      const draftCache = new Map<string, number | null>();
 
-        const documentId = context.params?.documentId;
+      const resolveDraftId = async (
+        documentId: string,
+        locale: string | null,
+      ): Promise<number | null> => {
+        const key = `${documentId}::${locale ?? ""}`;
+        if (draftCache.has(key)) return draftCache.get(key)!;
 
-        // Snapshot which registration IDs are linked to ANY row of this document BEFORE publish
-        let registrationIds: number[] = [];
-        if (documentId) {
-          try {
-            const oldRows = (await strapi.db.query(ACTIVITY_UID).findMany({
-              where: { documentId },
-              select: ["id"],
-            })) as any[];
+        const draft =
+          ((await strapi.db.query(ACTIVITY_UID).findOne({
+            where: {
+              documentId,
+              publishedAt: null,
+              ...(locale ? { locale } : {}),
+            },
+            select: ["id"],
+          })) as any) ??
+          ((await strapi.db.query(ACTIVITY_UID).findOne({
+            where: { documentId, publishedAt: null },
+            select: ["id"],
+          })) as any);
 
-            const oldIds = oldRows.map((r: any) => r.id);
-            if (oldIds.length > 0) {
-              const linked = (await strapi.db.query(REGISTRATION_UID).findMany({
-                where: { registeredActivity: { id: { $in: oldIds } } },
-                select: ["id"],
-              })) as any[];
-              registrationIds = linked.map((r: any) => r.id);
-            }
-          } catch (err) {
-            strapi.log.error("[bootstrap] pre-publish snapshot failed:", err);
-          }
-        }
+        const draftId = draft?.id ?? null;
+        draftCache.set(key, draftId);
+        return draftId;
+      };
 
-        // Run the actual publish
-        const result = await next();
+      const regs = (await strapi.db.query(REGISTRATION_UID).findMany({
+        where: { registeredActivity: { publishedAt: { $notNull: true } } },
+        select: ["id"],
+        populate: {
+          registeredActivity: {
+            select: ["id", "documentId", "locale", "publishedAt"],
+          },
+        },
+      })) as any[];
 
-        // Re-link registrations to the new published row
-        if (registrationIds.length > 0 && documentId) {
-          try {
-            const newPublished = (await strapi.db.query(ACTIVITY_UID).findOne({
-              where: { documentId, publishedAt: { $notNull: true } },
-              select: ["id"],
-            })) as any;
+      let moved = 0;
+      for (const reg of regs) {
+        const act = reg.registeredActivity;
+        if (!act?.documentId) continue;
 
-            if (newPublished) {
-              strapi.log.info(
-                `[bootstrap] activity republish: re-linking ${registrationIds.length} registration(s) → new id ${newPublished.id} (documentId=${documentId})`,
-              );
-              for (const regId of registrationIds) {
-                await strapi.db.query(REGISTRATION_UID).update({
-                  where: { id: regId },
-                  data: {
-                    registeredActivity: { set: [{ id: newPublished.id }] },
-                  },
-                });
-              }
-            }
-          } catch (err) {
-            strapi.log.error(
-              "[bootstrap] Failed to re-link registrations after activity republish:",
-              err,
-            );
-          }
-        }
+        const draftId = await resolveDraftId(act.documentId, act.locale ?? null);
+        if (!draftId || draftId === act.id) continue;
 
-        return result;
-      },
-    );
+        await strapi.db.query(REGISTRATION_UID).update({
+          where: { id: reg.id },
+          data: { registeredActivity: { set: [{ id: draftId }] } },
+        });
+        moved++;
+      }
+
+      if (moved > 0) {
+        strapi.log.info(
+          `[bootstrap] consolidated ${moved} registration(s) onto their activity's draft row`,
+        );
+      }
+    } catch (err) {
+      strapi.log.error(
+        "[bootstrap] registration draft-row consolidation failed:",
+        err,
+      );
+    }
 
     // Scheduled tasks (openScheduledForms / cancelExpiredRegistrations) are
     // registered via `cron.tasks` in config/server.ts, which calls the
