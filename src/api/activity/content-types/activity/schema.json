@@ -24,6 +24,15 @@
       },
       "required": true
     },
+    "activityShortName": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": false
+    },
     "slug": {
       "type": "uid",
       "targetField": "activityName"

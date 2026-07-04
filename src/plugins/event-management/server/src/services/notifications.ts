@@ -17,6 +17,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         where: { id: activityId },
         select: [
           "activityName",
+          "activityShortName",
           "zaloGroup",
           "activityStartDate",
           "activityEndDate",
@@ -33,6 +34,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     ]);
 
     const activityName = (activity as any)?.activityName ?? "";
+    const activityShortName =
+      (activity as any)?.activityShortName ?? activityName;
     const zaloGroup = (activity as any)?.zaloGroup ?? "";
     // The button links to this backend `confirm` endpoint: it runs the
     // confirmation logic and then redirects the browser to FRONTEND_URL.
@@ -109,7 +112,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         await strapi.plugins["email"].services.email.send({
           to: email,
           from: process.env.SMTP_DEFAULT_FROM || process.env.EMAIL_DEFAULT_FROM,
-          subject: `Xác nhận tham gia sự kiện "${activityName}" - Ni Viện Viên Không`,
+          subject: `Xác nhận tham gia sự kiện "${activityShortName}" - Ni Viện Viên Không`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
               <div style="background-color: #8B4513; padding: 24px; text-align: center; border-radius: 8px 8px 0 0;">
@@ -121,7 +124,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
                 <p>Kính gửi <strong>${fullName}</strong>,</p>
                 <p>
                   Ban Tổ Chức chân thành cảm ơn Quý vị đã đăng ký tham gia sự kiện
-                  <strong>${activityName}</strong>. Chúng tôi xin trân trọng xác nhận Quý vị đã
+                  <strong>${activityShortName}</strong>. Chúng tôi xin trân trọng xác nhận Quý vị đã
                   <strong>đăng ký thành công</strong> chương trình.
                 </p>
 
