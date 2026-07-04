@@ -34,12 +34,16 @@ export default factories.createCoreController(
           );
         }
 
-        const fullName =
-          entry.registreeData?.fullName ?? entry.fullName ?? "";
+        const fullName = entry.registreeData?.fullName ?? entry.fullName ?? "";
+
+        // Land the user on the activity's dedicated confirm page.
+        const slug = entry.registeredActivity?.slug ?? "";
+        const documentId = entry.registeredActivity?.documentId ?? "";
+        const confirmPageUrl = `${frontendUrl}/activity/${slug}-${documentId}/confirm`;
 
         if (entry.confirmed) {
           return ctx.redirect(
-            `${frontendUrl}?status=already_confirmed&name=${encodeURIComponent(fullName)}`,
+            `${confirmPageUrl}?status=already_confirmed&name=${encodeURIComponent(fullName)}`,
           );
         }
 
@@ -58,7 +62,7 @@ export default factories.createCoreController(
                 tokenExpiresAt: null,
               },
             });
-          return ctx.redirect(`${frontendUrl}?status=expired`);
+          return ctx.redirect(`${confirmPageUrl}?status=expired`);
         }
 
         // Confirm the registration
@@ -77,7 +81,7 @@ export default factories.createCoreController(
         const zaloGroup = entry.registeredActivity?.zaloGroup ?? "";
 
         const redirectUrl =
-          `${frontendUrl}?status=success` +
+          `${confirmPageUrl}?status=success` +
           `&name=${encodeURIComponent(fullName)}` +
           `&activity=${encodeURIComponent(activityName)}` +
           (zaloGroup ? `&zaloGroup=${encodeURIComponent(zaloGroup)}` : "");

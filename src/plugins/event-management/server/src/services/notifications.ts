@@ -20,8 +20,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           "zaloGroup",
           "activityStartDate",
           "activityEndDate",
-          "slug",
-          "documentId",
           "confirmExpiredDate",
         ],
       }),
@@ -36,10 +34,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const activityName = (activity as any)?.activityName ?? "";
     const zaloGroup = (activity as any)?.zaloGroup ?? "";
-    const slug = (activity as any)?.slug ?? "";
-    const documentId = (activity as any)?.documentId ?? "";
-    const frontendUrl =
-      process.env.FRONTEND_URL || "https://www.vienkhongni.com";
+    // The button links to this backend `confirm` endpoint: it runs the
+    // confirmation logic and then redirects the browser to FRONTEND_URL.
+    const backendUrl = process.env.STRAPI_ADMIN_URL || "http://localhost:1337";
     // Use the activity's explicit confirmation deadline if set; otherwise fall
     // back to a 3-day window from the moment the email is sent.
     const confirmExpiredDate = (activity as any)?.confirmExpiredDate;
@@ -106,7 +103,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           },
         });
 
-        const confirmationLink = `${frontendUrl}/activity/${slug}-${documentId}/confirm?code=${newToken}`;
+        const confirmationLink = `${backendUrl}/api/activity-registrations/confirm?code=${newToken}`;
         const expiryDateStr = formatDateTime(expiresAt);
 
         await strapi.plugins["email"].services.email.send({
