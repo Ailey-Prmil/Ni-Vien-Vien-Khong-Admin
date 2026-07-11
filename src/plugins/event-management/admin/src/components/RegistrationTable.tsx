@@ -24,7 +24,9 @@ import {
   Td,
   Th,
   Thead,
+  Textarea,
   TextInput,
+  Tooltip,
   Tr,
   Typography,
 } from "@strapi/design-system";
@@ -38,6 +40,7 @@ import {
   Cross,
   Filter,
   Plus,
+  Pencil,
 } from "@strapi/icons";
 import { PLUGIN_ID } from "../pluginId";
 import { useLocalStorage } from "../hooks/useLocalStorage";
@@ -82,6 +85,9 @@ const PAGE_SIZE = 30;
 const DEFAULT_COL_WIDTH = 180;
 const MIN_COL_WIDTH = 80;
 
+/** Fields that exist in the data/export but must never be offered as table columns. */
+const NON_COLUMN_FIELDS: string[] = ["adminNote"];
+
 // ── Data types ────────────────────────────────────────────────────────────────
 
 interface FieldDescriptor {
@@ -96,6 +102,7 @@ interface Registration {
   firstTimeRegistered: boolean;
   createdAt: string;
   confirmationEmailSentAt?: string;
+  adminNote?: string | null;
   registreeData?: Record<string, any>;
   registrationPayload?: Record<string, Record<string, any>>;
 }
@@ -447,6 +454,110 @@ function ColumnFilterControl({
   );
 }
 
+// ── Per-row note marker + editor ──────────────────────────────────────────────
+
+/** Leading row marker: a colored dot (only when a note exists) that reveals
+ *  the note text on hover. Rendered in the table's first column. */
+function NoteDot({ note }: { note?: string | null }) {
+  if (!(note && note.trim())) return null;
+  return (
+    <Tooltip label={note}>
+      <span
+        aria-label="Có ghi chú"
+        style={{ display: "inline-flex", cursor: "help" }}
+      >
+        <Box
+          background="primary600"
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            flexShrink: 0,
+          }}
+        />
+      </span>
+    </Tooltip>
+  );
+}
+
+interface NoteCellProps {
+  reg: Registration;
+  onSave: (registrationId: number, note: string) => Promise<void>;
+}
+
+function NoteCell({ reg, onSave }: NoteCellProps) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(reg.adminNote ?? "");
+  const [saving, setSaving] = useState(false);
+
+  const hasNote = !!(reg.adminNote && reg.adminNote.trim());
+
+  // Seed the editor from the current note each time the popover opens.
+  useEffect(() => {
+    if (open) setValue(reg.adminNote ?? "");
+  }, [open]);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await onSave(reg.id, value);
+      setOpen(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger>
+        <IconButton
+          label={hasNote ? "Sửa ghi chú" : "Thêm ghi chú"}
+          variant="ghost"
+          style={hasNote ? undefined : { opacity: 0.45 }}
+        >
+          <Pencil fill={hasNote ? "primary600" : "neutral500"} />
+        </IconButton>
+      </Popover.Trigger>
+      <Popover.Content>
+        <Box padding={3} style={{ minWidth: 280 }}>
+          <Typography variant="pi" textColor="neutral600">
+            Ghi chú
+          </Typography>
+          <Box marginTop={1} marginBottom={2}>
+            <Textarea
+              aria-label="Ghi chú"
+              placeholder="Nhập ghi chú cho đăng ký này…"
+              value={value}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setValue(e.target.value)
+              }
+              // The popover content sits inside a ScrollArea that treats Space,
+              // Enter and arrow keys as scroll commands and preventDefaults them.
+              // Stop the keydown here so the textarea receives spaces/newlines.
+              onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) =>
+                e.stopPropagation()
+              }
+            />
+          </Box>
+          <Flex gap={2} justifyContent="flex-end">
+            <Button
+              size="S"
+              variant="ghost"
+              onClick={() => setOpen(false)}
+              disabled={saving}
+            >
+              Huỷ
+            </Button>
+            <Button size="S" onClick={handleSave} loading={saving}>
+              Lưu
+            </Button>
+          </Flex>
+        </Box>
+      </Popover.Content>
+    </Popover.Root>
+  );
+}
+
 // ── Action confirmation modal ─────────────────────────────────────────────────
 
 type ActionType = "promote" | "confirm" | "cancel";
@@ -616,7 +727,7 @@ export function RegistrationTable({
   activityId,
   reloadKey,
 }: RegistrationTableProps) {
-  const { get, post } = useFetchClient();
+  const { get, post, put } = useFetchClient();
   const { toggleNotification } = useNotification();
   const { allowedActions } = useRBAC({
     canExport: [{ action: "plugin::event-management.export" }],
@@ -886,6 +997,29 @@ export function RegistrationTable({
     }
   };
 
+  const handleSaveNote = async (registrationId: number, note: string) => {
+    try {
+      await put(`/${PLUGIN_ID}/registrations/${registrationId}/note`, {
+        data: { note },
+      });
+      setAllRegistrations((prev) =>
+        prev.map((r) =>
+          r.id === registrationId ? { ...r, adminNote: note } : r,
+        ),
+      );
+      toggleNotification({ type: "success", message: "Note saved." });
+    } catch (err: any) {
+      const detail =
+        err?.response?.data?.error?.message ??
+        err?.message ??
+        (err?.status ? `HTTP ${err.status}` : "");
+      toggleNotification({
+        type: "danger",
+        message: detail ? `Failed to save note: ${detail}` : "Failed to save note.",
+      });
+    }
+  };
+
   function handleStatusChange(val: string | number) {
     const v = String(val ?? "");
     setStatusFilter(v);
@@ -1064,11 +1198,12 @@ export function RegistrationTable({
   const anyActionInProgress =
     promotingId !== null || confirmingId !== null || cancelingId !== null;
 
-  const colCount = visibleColumns.length + 1;
+  const colCount = visibleColumns.length + 2;
 
   function renderActionCell(reg: Registration) {
     return (
       <Flex gap={1}>
+        <NoteCell reg={reg} onSave={handleSaveNote} />
         {allowedActions.canManageWaitlist &&
           reg.registrationStatus === "pending" && (
             <Button
@@ -1134,6 +1269,9 @@ export function RegistrationTable({
   function renderDataRow(reg: Registration) {
     return (
       <Tr key={reg.id}>
+        <Td style={{ width: 28, textAlign: "center" }}>
+          <NoteDot note={reg.adminNote} />
+        </Td>
         {visibleColumns.map((col) => {
           const width = columnWidths[col] ?? DEFAULT_COL_WIDTH;
           return (
@@ -1248,6 +1386,11 @@ export function RegistrationTable({
           <Table colCount={colCount} rowCount={Math.max(total, 1)}>
             <Thead>
               <Tr>
+                <Th style={{ width: 28 }}>
+                  <Typography variant="sigma" textColor="neutral600">
+                    {/* note marker column */}
+                  </Typography>
+                </Th>
                 {visibleColumns.map((col) => {
                   const width = columnWidths[col] ?? DEFAULT_COL_WIDTH;
                   const label = fieldLabel(col, availableFields);
@@ -1325,6 +1468,9 @@ export function RegistrationTable({
               </Tr>
               {/* per-column filter row */}
               <Tr>
+                <Th style={{ width: 28 }}>
+                  <Box />
+                </Th>
                 {visibleColumns.map((col) => (
                   <Th key={col} style={{ whiteSpace: "nowrap" }}>
                     <ColumnFilterControl
@@ -1419,7 +1565,9 @@ export function RegistrationTable({
       {/* ── Column picker modal ── */}
       <ColumnPickerModal
         open={colPickerOpen}
-        availableFields={availableFields}
+        availableFields={availableFields.filter(
+          (f) => !NON_COLUMN_FIELDS.includes(f.key),
+        )}
         visible={visibleColumns}
         onChange={(cols) => patchView({ visibleColumns: cols })}
         onClose={() => setColPickerOpen(false)}

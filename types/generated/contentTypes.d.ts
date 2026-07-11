@@ -447,6 +447,12 @@ export interface ApiActivityRegistrationActivityRegistration
     };
   };
   attributes: {
+    adminNote: Schema.Attribute.Text &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     confirmationEmailSentAt: Schema.Attribute.DateTime &
       Schema.Attribute.SetPluginOptions<{
         i18n: {

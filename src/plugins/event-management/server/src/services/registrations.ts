@@ -161,4 +161,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     });
     return { canceled: true, registrationId };
   },
+
+  async updateNote(registrationId: number, note: string) {
+    const reg = await strapi.db
+      .query(REGISTRATION_UID)
+      .findOne({ where: { id: registrationId } });
+    if (!reg) return { error: "not_found" as const };
+    await strapi.db.query(REGISTRATION_UID).update({
+      where: { id: registrationId },
+      data: { adminNote: note },
+    });
+    return { updated: true, registrationId, adminNote: note };
+  },
 });
