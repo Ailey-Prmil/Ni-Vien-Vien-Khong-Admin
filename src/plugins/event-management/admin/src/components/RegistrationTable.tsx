@@ -461,7 +461,21 @@ function ColumnFilterControl({
 function NoteDot({ note }: { note?: string | null }) {
   if (!(note && note.trim())) return null;
   return (
-    <Tooltip label={note}>
+    <Tooltip
+      label={
+        <span
+          style={{
+            display: "block",
+            maxWidth: 240,
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+            textAlign: "left",
+          }}
+        >
+          {note}
+        </span>
+      }
+    >
       <span
         aria-label="Có ghi chú"
         style={{ display: "inline-flex", cursor: "help" }}
