@@ -1291,7 +1291,7 @@ export function RegistrationTable({
                             textAlign: "left",
                           }}
                         >
-                          <Typography variant="sigma">
+                          <Typography variant="sigma" textColor="neutral600">
                             {label}
                             {sortBy === col
                               ? sortOrder === "asc"
@@ -1318,7 +1318,9 @@ export function RegistrationTable({
                   );
                 })}
                 <Th>
-                  <Typography variant="sigma">Actions</Typography>
+                  <Typography variant="sigma" textColor="neutral600">
+                    Actions
+                  </Typography>
                 </Th>
               </Tr>
               {/* per-column filter row */}
