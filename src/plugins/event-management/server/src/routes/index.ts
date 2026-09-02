@@ -148,6 +148,19 @@ export default {
           ],
         },
       },
+      {
+        method: "PUT",
+        path: "/registrations/:registrationId/note",
+        handler: "event-management.updateRegistrationNote",
+        config: {
+          policies: [
+            {
+              name: "admin::hasPermissions",
+              config: { actions: ["plugin::event-management.read"] },
+            },
+          ],
+        },
+      },
     ],
   },
 };

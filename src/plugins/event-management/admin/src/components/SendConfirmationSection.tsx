@@ -55,7 +55,7 @@ export function SendConfirmationSection({
   const alreadySentCount = activeCount - unsentActive;
 
   return (
-    <Box background="white" padding={5} borderRadius="4px">
+    <Box background="neutral0" padding={5} borderRadius="4px">
       <Flex direction="column" gap={1} marginBottom={4}>
         <Typography variant="beta" marginBottom={3}>
           Send Confirmation Emails

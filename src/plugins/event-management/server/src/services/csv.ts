@@ -4,6 +4,7 @@ const META_LABELS: Record<string, string> = {
   confirmed: 'Confirmed',
   firstTimeRegistered: 'First Timer',
   createdAt: 'Registered At',
+  adminNote: 'Note',
 };
 
 const REGISTREE_LABELS: Record<string, string> = {
@@ -36,6 +37,7 @@ export function flattenRegistration(reg: any): Record<string, unknown> {
     confirmed: reg.confirmed,
     firstTimeRegistered: reg.firstTimeRegistered,
     createdAt: reg.createdAt,
+    adminNote: reg.adminNote,
   };
 
   // registreeData fields
@@ -70,6 +72,7 @@ export function discoverFields(registrations: any[]): { key: string; label: stri
     'confirmed',
     'firstTimeRegistered',
     'createdAt',
+    'adminNote',
   ];
 
   const registreeKeys = new Set<string>();

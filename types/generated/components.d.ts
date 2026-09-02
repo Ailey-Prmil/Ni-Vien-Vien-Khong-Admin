@@ -84,7 +84,7 @@ export interface FormComponentFormComponent extends Struct.ComponentSchema {
     icon: 'connector';
   };
   attributes: {
-    attributeName: Schema.Attribute.String & Schema.Attribute.Required;
+    attributeName: Schema.Attribute.String;
     isRequired: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<false>;
@@ -190,6 +190,8 @@ export interface FormSectionBasicInformation extends Struct.ComponentSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<true>;
     phoneNumber: Schema.Attribute.String & Schema.Attribute.Required;
+    province: Schema.Attribute.String & Schema.Attribute.Required;
+    ward: Schema.Attribute.String & Schema.Attribute.Required;
     zaloName: Schema.Attribute.String;
   };
 }

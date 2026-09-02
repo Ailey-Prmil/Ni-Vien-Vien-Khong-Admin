@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-04-30T16:07:29.521Z"
+    "x-generation-date": "2026-07-11T03:38:10.758Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -8325,6 +8325,9 @@
               "activityName": {
                 "type": "string"
               },
+              "activityShortName": {
+                "type": "string"
+              },
               "slug": {
                 "type": "string"
               },
@@ -8359,6 +8362,9 @@
               "ageRestricted": {
                 "type": "boolean"
               },
+              "pendingListIncluded": {
+                "type": "boolean"
+              },
               "minAge": {
                 "type": "integer"
               },
@@ -8370,6 +8376,14 @@
                 "format": "date-time"
               },
               "activityEndDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "formOpenedDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "confirmExpiredDate": {
                 "type": "string",
                 "format": "date-time"
               },
@@ -8414,6 +8428,9 @@
                   ],
                   "example": "string or id"
                 }
+              },
+              "formOpened": {
+                "type": "boolean"
               },
               "registrationForm": {
                 "$ref": "#/components/schemas/FormComponentFormTemplateComponent"
@@ -8498,6 +8515,9 @@
             "type": "string"
           },
           "activityName": {
+            "type": "string"
+          },
+          "activityShortName": {
             "type": "string"
           },
           "slug": {
@@ -9331,6 +9351,9 @@
           "ageRestricted": {
             "type": "boolean"
           },
+          "pendingListIncluded": {
+            "type": "boolean"
+          },
           "minAge": {
             "type": "integer"
           },
@@ -9342,6 +9365,14 @@
             "format": "date-time"
           },
           "activityEndDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "formOpenedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "confirmExpiredDate": {
             "type": "string",
             "format": "date-time"
           },
@@ -9367,6 +9398,9 @@
                   "type": "string"
                 },
                 "activityName": {
+                  "type": "string"
+                },
+                "activityShortName": {
                   "type": "string"
                 },
                 "slug": {
@@ -9563,6 +9597,9 @@
                 "ageRestricted": {
                   "type": "boolean"
                 },
+                "pendingListIncluded": {
+                  "type": "boolean"
+                },
                 "minAge": {
                   "type": "integer"
                 },
@@ -9574,6 +9611,14 @@
                   "format": "date-time"
                 },
                 "activityEndDate": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "formOpenedDate": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "confirmExpiredDate": {
                   "type": "string",
                   "format": "date-time"
                 },
@@ -9684,6 +9729,9 @@
                           }
                         }
                       },
+                      "adminNote": {
+                        "type": "string"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -9758,6 +9806,9 @@
                       }
                     }
                   }
+                },
+                "formOpened": {
+                  "type": "boolean"
                 },
                 "registrationForm": {
                   "$ref": "#/components/schemas/FormComponentFormTemplateComponent"
@@ -9875,6 +9926,9 @@
                 }
               }
             }
+          },
+          "formOpened": {
+            "type": "boolean"
           },
           "registrationForm": {
             "$ref": "#/components/schemas/FormComponentFormTemplateComponent"
@@ -10562,6 +10616,12 @@
             "format": "email"
           },
           "address": {
+            "type": "string"
+          },
+          "ward": {
+            "type": "string"
+          },
+          "province": {
             "type": "string"
           },
           "phoneNumber": {

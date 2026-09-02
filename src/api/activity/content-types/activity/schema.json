@@ -24,6 +24,15 @@
       },
       "required": true
     },
+    "activityShortName": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": false
+    },
     "slug": {
       "type": "uid",
       "targetField": "activityName"
@@ -94,6 +103,15 @@
       },
       "default": false
     },
+    "pendingListIncluded": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": false
+    },
     "minAge": {
       "type": "integer",
       "pluginOptions": {
@@ -148,6 +166,22 @@
       },
       "required": false
     },
+    "formOpenedDate": {
+      "type": "datetime",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "confirmExpiredDate": {
+      "type": "datetime",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
     "courseContent": {
       "type": "component",
       "pluginOptions": {
@@ -195,6 +229,15 @@
         }
       },
       "mappedBy": "registeredActivity"
+    },
+    "formOpened": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "default": true
     },
     "registrationForm": {
       "type": "component",

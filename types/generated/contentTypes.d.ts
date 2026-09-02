@@ -447,6 +447,12 @@ export interface ApiActivityRegistrationActivityRegistration
     };
   };
   attributes: {
+    adminNote: Schema.Attribute.Text &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     confirmationEmailSentAt: Schema.Attribute.DateTime &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -475,7 +481,8 @@ export interface ApiActivityRegistrationActivityRegistration
         i18n: {
           localized: false;
         };
-      }>;
+      }> &
+      Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -573,6 +580,12 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::activity-registration.activity-registration'
     >;
+    activityShortName: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     activityStartDate: Schema.Attribute.DateTime &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -587,6 +600,12 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
         };
       }> &
       Schema.Attribute.DefaultTo<false>;
+    confirmExpiredDate: Schema.Attribute.DateTime &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     content: Schema.Attribute.Blocks &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -609,6 +628,19 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    formOpened: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<true>;
+    formOpenedDate: Schema.Attribute.DateTime &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -626,6 +658,13 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
           localized: false;
         };
       }>;
+    pendingListIncluded: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     registrationForm: Schema.Attribute.Component<
       'form-component.form-template',

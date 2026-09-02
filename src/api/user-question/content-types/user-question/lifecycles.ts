@@ -186,7 +186,7 @@ export default {
                 ${result.questionContent}
               </blockquote>
               <p><strong>Trạng thái:</strong> <span style="color: #ff9800;">${result.questionStatus || 'pending'}</span></p>
-              <p><strong>Thời gian:</strong> ${new Date(result.createdAt).toLocaleString('vi-VN')}</p>
+              <p><strong>Thời gian:</strong> ${new Date(result.createdAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}</p>
             </div>
             <p style="margin-top: 20px;">
               <a href="${process.env.STRAPI_ADMIN_URL || 'http://localhost:1337'}/admin/content-manager/collection-types/api::user-question.user-question/${result.documentId}" 

@@ -20,7 +20,9 @@ export default {
       data.registeredActivity?.connect?.[0]?.id ??
       data.registeredActivity?.set?.[0]?.id ??
       data.registeredActivity?.id ??
-      (typeof data.registeredActivity === "number" ? data.registeredActivity : undefined);
+      (typeof data.registeredActivity === "number"
+        ? data.registeredActivity
+        : undefined);
 
     if (!activityId) {
       // No activity linked — fall back to schema default
@@ -29,15 +31,15 @@ export default {
 
     const activity = await strapi.db.query(ACTIVITY_UID).findOne({
       where: { id: activityId },
-      select: ["registrationLimit", "activityCategory"],
+      select: ["registrationLimit"],
     });
 
     if (!activity) return;
 
-    const { registrationLimit, activityCategory } = activity as any;
+    const { registrationLimit } = activity as any;
 
     // Rule 1 — Khóa Tu: non-first-timers always go to pending
-    if (activityCategory === "Khóa Tu" && data.firstTimeRegistered === false) {
+    if (data.firstTimeRegistered === false) {
       data.registrationStatus = "pending";
       return;
     }

@@ -39,7 +39,8 @@
         "i18n": {
           "localized": false
         }
-      }
+      },
+      "default": true
     },
     "registrationStatus": {
       "type": "enumeration",
@@ -117,6 +118,14 @@
       "relation": "manyToOne",
       "target": "api::activity.activity",
       "inversedBy": "activityRegistrations"
+    },
+    "adminNote": {
+      "type": "text",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
     }
   }
 }
